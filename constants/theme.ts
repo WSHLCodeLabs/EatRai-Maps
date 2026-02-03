@@ -1,30 +1,81 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Theme configuration for EatRai Maps
+ * Dark mode restaurant finder with neon green accents
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Primary accent color - Neon Green
+const neonGreen = '#7CEB00';
+
+// Dark theme color palette
+const deepBlack = '#0D0D0D';
+const darkGray = '#1A1A1A';
+const mediumGray = '#2A2A2A';
+const lightGray = '#8A8A8A';
 
 export const Colors = {
+  // Accent colors
+  primary: neonGreen,
+  neonGreen,
+
+  // Background colors
+  deepBlack,
+  darkGray,
+  mediumGray,
+
+  // Text colors
+  textPrimary: '#FFFFFF',
+  textSecondary: lightGray,
+  textMuted: '#5A5A5A',
+
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: '#FFFFFF',
+    background: deepBlack,
+    tint: neonGreen,
+    icon: lightGray,
+    tabIconDefault: lightGray,
+    tabIconSelected: neonGreen,
+    card: darkGray,
+    border: mediumGray,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#FFFFFF',
+    background: deepBlack,
+    tint: neonGreen,
+    icon: lightGray,
+    tabIconDefault: lightGray,
+    tabIconSelected: neonGreen,
+    card: darkGray,
+    border: mediumGray,
   },
+};
+
+// Glow effect for neon elements
+export const NeonGlow = {
+  shadowColor: neonGreen,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.6,
+  shadowRadius: 12,
+  elevation: 8,
+};
+
+// Subtle glow for secondary elements
+export const SubtleGlow = {
+  shadowColor: neonGreen,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.3,
+  shadowRadius: 6,
+  elevation: 4,
+};
+
+// Card shadow for glassmorphism effect
+export const CardShadow = {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.3,
+  shadowRadius: 8,
+  elevation: 6,
 };
 
 export const Fonts = Platform.select({
