@@ -5,12 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     FlatList,
+    Platform,
     SafeAreaView,
+    StatusBar,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 // Mock restaurant data
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 20,
-        paddingTop: 20,
+        paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 24) + 16 : 20,
         paddingBottom: 12,
     },
     title: {
