@@ -1,5 +1,6 @@
 import { CardShadow, Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -19,10 +20,18 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* Sign In Button */}
-                <TouchableOpacity style={styles.signInButton}>
+                <TouchableOpacity style={styles.signInButton} onPress={() => router.push('/login')}>
                     <Ionicons name="log-in-outline" size={20} color={Colors.deepBlack} />
                     <Text style={styles.signInText}>Sign In</Text>
                 </TouchableOpacity>
+
+                {/* Create Account Link */}
+                <View style={styles.createAccountContainer}>
+                    <Text style={styles.createAccountText}>Don't have an account? </Text>
+                    <TouchableOpacity onPress={() => router.push('/signup')}>
+                        <Text style={styles.createAccountLink}>Sign up</Text>
+                    </TouchableOpacity>
+                </View>
 
                 {/* Menu Items */}
                 <View style={[styles.menuSection, CardShadow]}>
@@ -152,5 +161,20 @@ const styles = StyleSheet.create({
         color: Colors.textMuted,
         fontSize: 12,
         marginTop: 24,
+    },
+    createAccountContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    createAccountText: {
+        fontSize: 14,
+        color: Colors.textSecondary,
+    },
+    createAccountLink: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: Colors.neonGreen,
     },
 });
