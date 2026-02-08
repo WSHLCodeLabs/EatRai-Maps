@@ -20,7 +20,7 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* Sign In Button */}
-                <TouchableOpacity style={styles.signInButton} onPress={() => router.push('/login')}>
+                <TouchableOpacity style={styles.signInButton} onPress={() => router.push('/login' as any)}>
                     <Ionicons name="log-in-outline" size={20} color={Colors.deepBlack} />
                     <Text style={styles.signInText}>Sign In</Text>
                 </TouchableOpacity>
@@ -28,7 +28,7 @@ export default function ProfileScreen() {
                 {/* Create Account Link */}
                 <View style={styles.createAccountContainer}>
                     <Text style={styles.createAccountText}>Don't have an account? </Text>
-                    <TouchableOpacity onPress={() => router.push('/signup')}>
+                    <TouchableOpacity onPress={() => router.push('/signup' as any)}>
                         <Text style={styles.createAccountLink}>Sign up</Text>
                     </TouchableOpacity>
                 </View>
