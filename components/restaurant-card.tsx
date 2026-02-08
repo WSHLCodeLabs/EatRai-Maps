@@ -1,4 +1,6 @@
+import { CrowdLevelBadge } from '@/components/CrowdLevelBadge';
 import { CardShadow, Colors, SubtleGlow } from '@/constants/theme';
+import { CROWD_COLORS, CrowdLevel } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React from 'react';
@@ -14,7 +16,9 @@ interface RestaurantCardProps {
     tag?: string;
     latitude?: number;
     longitude?: number;
+    crowdLevel?: CrowdLevel;
     onPress?: () => void;
+    onReportPress?: () => void;
 }
 
 export function RestaurantCard({
@@ -26,7 +30,9 @@ export function RestaurantCard({
     tag = 'QUIET',
     latitude,
     longitude,
+    crowdLevel,
     onPress,
+    onReportPress,
 }: RestaurantCardProps) {
     return (
         <TouchableOpacity style={[styles.card, CardShadow]} onPress={onPress} activeOpacity={0.9}>
@@ -52,7 +58,9 @@ export function RestaurantCard({
                 <View style={styles.ratingRow}>
                     <Ionicons name="star" size={14} color={Colors.neonGreen} />
                     <Text style={styles.rating}>{rating.toFixed(1)}</Text>
-                    {tag && (
+                    {crowdLevel ? (
+                        <CrowdLevelBadge level={crowdLevel} size="small" />
+                    ) : tag && (
                         <View style={[styles.tag, SubtleGlow]}>
                             <Text style={styles.tagText}>{tag}</Text>
                         </View>
@@ -60,19 +68,39 @@ export function RestaurantCard({
                 </View>
             </View>
 
-            {/* Navigation Button */}
-            {latitude && longitude ? (
-                <NavigationButton
-                    latitude={latitude}
-                    longitude={longitude}
-                    destinationName={name}
-                    size="small"
-                />
-            ) : (
-                <TouchableOpacity style={styles.arrowButton}>
-                    <Ionicons name="arrow-forward" size={20} color={Colors.textSecondary} />
-                </TouchableOpacity>
-            )}
+            {/* Buttons Container */}
+            <View style={styles.buttonsContainer}>
+                {/* Report Crowd Button */}
+                {onReportPress && (
+                    <TouchableOpacity
+                        style={[
+                            styles.reportButton,
+                            crowdLevel && { borderColor: CROWD_COLORS[crowdLevel] }
+                        ]}
+                        onPress={onReportPress}
+                    >
+                        <Ionicons
+                            name="megaphone"
+                            size={18}
+                            color={crowdLevel ? CROWD_COLORS[crowdLevel] : Colors.neonGreen}
+                        />
+                    </TouchableOpacity>
+                )}
+
+                {/* Navigation Button */}
+                {latitude && longitude ? (
+                    <NavigationButton
+                        latitude={latitude}
+                        longitude={longitude}
+                        destinationName={name}
+                        size="small"
+                    />
+                ) : (
+                    <TouchableOpacity style={styles.arrowButton} onPress={onPress}>
+                        <Ionicons name="arrow-forward" size={20} color={Colors.textSecondary} />
+                    </TouchableOpacity>
+                )}
+            </View>
         </TouchableOpacity>
     );
 }
@@ -87,8 +115,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
     },
     imageContainer: {
-        width: 70,
-        height: 70,
+        width: 60,
+        height: 60,
         borderRadius: 12,
         overflow: 'hidden',
     },
@@ -107,14 +135,14 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: '600',
         color: Colors.textPrimary,
         marginBottom: 2,
     },
     details: {
         fontSize: 13,
         color: Colors.textSecondary,
-        marginBottom: 6,
+        marginBottom: 4,
     },
     ratingRow: {
         flexDirection: 'row',
@@ -125,19 +153,18 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: Colors.textPrimary,
         marginLeft: 4,
+        marginRight: 8,
     },
     tag: {
         backgroundColor: Colors.neonGreen,
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 4,
-        marginLeft: 10,
     },
     tagText: {
         fontSize: 10,
         fontWeight: '700',
         color: Colors.deepBlack,
-        letterSpacing: 0.5,
     },
     arrowButton: {
         width: 40,
@@ -146,5 +173,20 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.mediumGray,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    reportButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: Colors.mediumGray,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: Colors.neonGreen,
     },
 });

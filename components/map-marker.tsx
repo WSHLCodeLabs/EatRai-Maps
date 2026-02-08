@@ -1,4 +1,5 @@
 import { Colors, NeonGlow, SubtleGlow } from '@/constants/theme';
+import { CROWD_COLORS, CrowdLevel } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -6,19 +7,29 @@ import { StyleSheet, View } from 'react-native';
 interface MapMarkerProps {
     selected?: boolean;
     rating?: number;
+    crowdLevel?: CrowdLevel;
 }
 
-export function MapMarker({ selected = false, rating }: MapMarkerProps) {
+export function MapMarker({ selected = false, rating, crowdLevel }: MapMarkerProps) {
+    // Get color based on crowd level
+    const markerColor = crowdLevel ? CROWD_COLORS[crowdLevel] : Colors.neonGreen;
+
     return (
-        <View style={[styles.container, selected && NeonGlow]}>
-            <View style={[styles.marker, selected ? styles.markerSelected : styles.markerDefault]}>
+        <View style={[styles.container, selected && { ...NeonGlow, shadowColor: markerColor }]}>
+            <View style={[
+                styles.marker,
+                {
+                    borderColor: markerColor,
+                    backgroundColor: selected ? markerColor : Colors.darkGray,
+                }
+            ]}>
                 {rating ? (
                     <View style={styles.ratingContainer}>
-                        <Ionicons name="leaf" size={10} color={selected ? Colors.deepBlack : Colors.neonGreen} />
+                        <Ionicons name="leaf" size={10} color={selected ? Colors.deepBlack : markerColor} />
                         <View style={styles.ratingBadge}>
-                            <Ionicons name="star" size={8} color={Colors.neonGreen} />
+                            <Ionicons name="star" size={8} color={markerColor} />
                             <View style={styles.ratingText}>
-                                <Ionicons name="star" size={8} color={Colors.neonGreen} />
+                                <Ionicons name="star" size={8} color={markerColor} />
                             </View>
                         </View>
                     </View>
@@ -26,31 +37,36 @@ export function MapMarker({ selected = false, rating }: MapMarkerProps) {
                     <Ionicons
                         name="restaurant"
                         size={14}
-                        color={selected ? Colors.deepBlack : Colors.neonGreen}
+                        color={selected ? Colors.deepBlack : markerColor}
                     />
                 )}
             </View>
             {/* Pin point */}
-            <View style={[styles.pin, selected && { backgroundColor: Colors.neonGreen }]} />
+            <View style={[styles.pin, { backgroundColor: markerColor }]} />
         </View>
     );
 }
 
 // Simple marker for showing restaurant on map
-export function SimpleMapMarker({ label, selected = false }: { label?: string; selected?: boolean }) {
+export function SimpleMapMarker({ label, selected = false, crowdLevel }: { label?: string; selected?: boolean; crowdLevel?: CrowdLevel }) {
+    const markerColor = crowdLevel ? CROWD_COLORS[crowdLevel] : Colors.neonGreen;
+
     return (
-        <View style={[styles.simpleContainer, selected && SubtleGlow]}>
-            <View style={[styles.simpleMarker, selected && styles.simpleMarkerSelected]}>
+        <View style={[styles.simpleContainer, selected && { ...SubtleGlow, shadowColor: markerColor }]}>
+            <View style={[
+                styles.simpleMarker,
+                selected && { backgroundColor: markerColor, borderColor: markerColor }
+            ]}>
                 {label ? (
                     <View style={styles.labelRow}>
-                        <Ionicons name="leaf" size={10} color={selected ? Colors.deepBlack : Colors.neonGreen} />
+                        <Ionicons name="leaf" size={10} color={selected ? Colors.deepBlack : markerColor} />
                         <View style={styles.labelText}>
-                            <Ionicons name="star" size={8} color={Colors.neonGreen} />
+                            <Ionicons name="star" size={8} color={markerColor} />
                             <View style={styles.labelValue} />
                         </View>
                     </View>
                 ) : (
-                    <View style={styles.dot} />
+                    <View style={[styles.dot, { backgroundColor: markerColor }]} />
                 )}
             </View>
         </View>
@@ -69,14 +85,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 2,
     },
-    markerDefault: {
-        backgroundColor: Colors.darkGray,
-        borderColor: Colors.neonGreen,
-    },
-    markerSelected: {
-        backgroundColor: Colors.neonGreen,
-        borderColor: Colors.neonGreen,
-    },
     ratingContainer: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -91,7 +99,6 @@ const styles = StyleSheet.create({
     pin: {
         width: 3,
         height: 8,
-        backgroundColor: Colors.mediumGray,
         borderBottomLeftRadius: 2,
         borderBottomRightRadius: 2,
         marginTop: -2,
@@ -106,10 +113,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.darkGray,
         borderWidth: 1,
         borderColor: Colors.mediumGray,
-    },
-    simpleMarkerSelected: {
-        backgroundColor: Colors.neonGreen,
-        borderColor: Colors.neonGreen,
     },
     labelRow: {
         flexDirection: 'row',
@@ -128,6 +131,5 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: Colors.neonGreen,
     },
 });

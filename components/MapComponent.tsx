@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/theme';
+import { CrowdLevel } from '@/data/restaurants-data';
 import React, { forwardRef } from 'react';
 import { StyleSheet } from 'react-native';
 // @ts-ignore
@@ -10,6 +11,7 @@ interface Restaurant {
   name: string;
   latitude: number;
   longitude: number;
+  crowdLevel?: CrowdLevel;
 }
 
 interface RouteCoordinate {
@@ -23,6 +25,7 @@ interface MapComponentProps {
   onMarkerPress?: (restaurant: Restaurant) => void;
   route?: RouteCoordinate[];
   showRoute?: boolean;
+  children?: React.ReactNode;
 }
 
 const MapComponent = forwardRef<any, MapComponentProps>((props, ref) => {
@@ -32,6 +35,7 @@ const MapComponent = forwardRef<any, MapComponentProps>((props, ref) => {
     onMarkerPress,
     route = [],
     showRoute = false,
+    children,
     ...restProps
   } = props;
 
@@ -40,18 +44,18 @@ const MapComponent = forwardRef<any, MapComponentProps>((props, ref) => {
       ref={ref}
       style={styles.map}
       initialRegion={{
-        latitude: 13.7563, // Default to Bangkok
-        longitude: 100.5018,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
+        latitude: 14.0205,
+        longitude: 99.9870,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
       }}
       rotateEnabled={true}
       showsUserLocation={true}
-      showsMyLocationButton={false} // Custom button used
+      showsMyLocationButton={false}
       provider={PROVIDER_DEFAULT}
       {...restProps}
     >
-      {/* Restaurant Markers */}
+      {/* Restaurant Markers with crowd level colors */}
       {restaurants.map((restaurant) => (
         <Marker
           key={restaurant.id}
@@ -62,7 +66,10 @@ const MapComponent = forwardRef<any, MapComponentProps>((props, ref) => {
           title={restaurant.name}
           onPress={() => onMarkerPress?.(restaurant)}
         >
-          <MapMarker selected={selectedRestaurantId === restaurant.id} />
+          <MapMarker
+            selected={selectedRestaurantId === restaurant.id}
+            crowdLevel={restaurant.crowdLevel}
+          />
         </Marker>
       ))}
 
@@ -75,14 +82,17 @@ const MapComponent = forwardRef<any, MapComponentProps>((props, ref) => {
           lineDashPattern={[1]}
         />
       )}
+
+      {/* Allow children for custom markers */}
+      {children}
     </MapView>
   );
 });
-
-export default MapComponent;
 
 const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
 });
+
+export default MapComponent;

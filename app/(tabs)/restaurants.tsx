@@ -1,6 +1,9 @@
+import { CrowdReportModal } from '@/components/CrowdReportModal';
 import { FilterChip } from '@/components/filter-chip';
 import { RestaurantCard } from '@/components/restaurant-card';
 import { Colors } from '@/constants/theme';
+import { useRestaurants } from '@/context/RestaurantContext';
+import { Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -15,87 +18,42 @@ import {
     View
 } from 'react-native';
 
-// Mock restaurant data with coordinates around Bangkok
-const RESTAURANTS = [
-    {
-        id: '1',
-        name: 'The Green Room',
-        cuisine: 'Italian',
-        distance: '0.4mi',
-        rating: 4.8,
-        tag: 'QUIET',
-        imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200',
-        latitude: 13.7463,
-        longitude: 100.5340,
-    },
-    {
-        id: '2',
-        name: 'Sakura Ramen House',
-        cuisine: 'Japanese',
-        distance: '0.7mi',
-        rating: 4.6,
-        tag: 'POPULAR',
-        imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200',
-        latitude: 13.7400,
-        longitude: 100.5350,
-    },
-    {
-        id: '3',
-        name: 'Café Luna',
-        cuisine: 'French Café',
-        distance: '0.3mi',
-        rating: 4.9,
-        tag: 'QUIET',
-        imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200',
-        latitude: 13.7480,
-        longitude: 100.5410,
-    },
-    {
-        id: '4',
-        name: 'Spice Garden',
-        cuisine: 'Indian',
-        distance: '1.2mi',
-        rating: 4.5,
-        tag: 'BUSY',
-        imageUrl: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=200',
-        latitude: 13.7520,
-        longitude: 100.4920,
-    },
-    {
-        id: '5',
-        name: 'Ocean Blue',
-        cuisine: 'Seafood',
-        distance: '0.9mi',
-        rating: 4.7,
-        tag: 'QUIET',
-        imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=200',
-        latitude: 13.7580,
-        longitude: 100.5150,
-    },
-];
-
-type FilterType = 'all' | 'quiet' | 'popular' | 'nearby';
+type FilterType = 'all' | 'quiet' | 'moderate' | 'busy' | 'nearby';
 
 export default function RestaurantsScreen() {
+    const { restaurants, calculateDistanceToRestaurant } = useRestaurants();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+    const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
-    const filteredRestaurants = RESTAURANTS.filter((restaurant) => {
+    const filteredRestaurants = restaurants.filter((restaurant) => {
         const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesFilter =
             activeFilter === 'all' ||
-            (activeFilter === 'quiet' && restaurant.tag === 'QUIET') ||
-            (activeFilter === 'popular' && restaurant.tag === 'POPULAR') ||
-            (activeFilter === 'nearby' && parseFloat(restaurant.distance) < 0.5);
+            (activeFilter === 'quiet' && restaurant.crowdLevel === 'Quiet') ||
+            (activeFilter === 'moderate' && restaurant.crowdLevel === 'Moderate') ||
+            (activeFilter === 'busy' && restaurant.crowdLevel === 'Busy') ||
+            (activeFilter === 'nearby' && parseFloat(restaurant.distance) <= 0.5);
         return matchesSearch && matchesFilter;
     });
+
+    const handleReportPress = (restaurant: Restaurant) => {
+        setSelectedRestaurant(restaurant);
+        setModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalVisible(false);
+        setSelectedRestaurant(null);
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.title}>Restaurants</Text>
-                <Text style={styles.subtitle}>{filteredRestaurants.length} places nearby</Text>
+                <Text style={styles.subtitle}>Near KU Kamphaeng Saen • {filteredRestaurants.length} places</Text>
             </View>
 
             {/* Search Bar */}
@@ -132,16 +90,16 @@ export default function RestaurantsScreen() {
                     onPress={() => setActiveFilter('quiet')}
                 />
                 <FilterChip
-                    icon="flame"
-                    text="Popular"
-                    active={activeFilter === 'popular'}
-                    onPress={() => setActiveFilter('popular')}
+                    icon="people"
+                    text="Moderate"
+                    active={activeFilter === 'moderate'}
+                    onPress={() => setActiveFilter('moderate')}
                 />
                 <FilterChip
-                    icon="location"
-                    text="Nearby"
-                    active={activeFilter === 'nearby'}
-                    onPress={() => setActiveFilter('nearby')}
+                    icon="flame"
+                    text="Busy"
+                    active={activeFilter === 'busy'}
+                    onPress={() => setActiveFilter('busy')}
                 />
             </View>
 
@@ -156,12 +114,13 @@ export default function RestaurantsScreen() {
                     <RestaurantCard
                         name={item.name}
                         cuisine={item.cuisine}
-                        distance={item.distance}
+                        distance={calculateDistanceToRestaurant(item.latitude, item.longitude)}
                         rating={item.rating}
-                        tag={item.tag}
+                        crowdLevel={item.crowdLevel}
                         imageUrl={item.imageUrl}
                         latitude={item.latitude}
                         longitude={item.longitude}
+                        onReportPress={() => handleReportPress(item)}
                     />
                 )}
                 ListEmptyComponent={
@@ -170,6 +129,13 @@ export default function RestaurantsScreen() {
                         <Text style={styles.emptyText}>No restaurants found</Text>
                     </View>
                 }
+            />
+
+            {/* Crowd Report Modal */}
+            <CrowdReportModal
+                visible={modalVisible}
+                restaurant={selectedRestaurant}
+                onClose={handleCloseModal}
             />
         </SafeAreaView>
     );

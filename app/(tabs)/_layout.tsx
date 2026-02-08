@@ -4,57 +4,60 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/theme';
+import { RestaurantProvider } from '@/context/RestaurantContext';
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors.neonGreen,
-        tabBarInactiveTintColor: Colors.textSecondary,
-        headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabBarLabel,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'MAP',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'location' : 'location-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="restaurants"
-        options={{
-          title: 'RESTAURANTS',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'restaurant' : 'restaurant-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'PROFILE',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'person' : 'person-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+    <RestaurantProvider>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors.neonGreen,
+          tabBarInactiveTintColor: Colors.textSecondary,
+          headerShown: false,
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabBarLabel,
+        }}>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'MAP',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? 'location' : 'location-outline'}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="restaurants"
+          options={{
+            title: 'RESTAURANTS',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? 'restaurant' : 'restaurant-outline'}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'PROFILE',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? 'person' : 'person-outline'}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </RestaurantProvider>
   );
 }
 
