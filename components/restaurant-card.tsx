@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NavigationButton } from './navigation-button';
 
 interface RestaurantCardProps {
     name: string;
@@ -11,6 +12,8 @@ interface RestaurantCardProps {
     rating: number;
     imageUrl?: string;
     tag?: string;
+    latitude?: number;
+    longitude?: number;
     onPress?: () => void;
 }
 
@@ -21,6 +24,8 @@ export function RestaurantCard({
     rating,
     imageUrl,
     tag = 'QUIET',
+    latitude,
+    longitude,
     onPress,
 }: RestaurantCardProps) {
     return (
@@ -55,10 +60,19 @@ export function RestaurantCard({
                 </View>
             </View>
 
-            {/* Navigation Arrow */}
-            <TouchableOpacity style={styles.arrowButton}>
-                <Ionicons name="arrow-forward" size={20} color={Colors.textSecondary} />
-            </TouchableOpacity>
+            {/* Navigation Button */}
+            {latitude && longitude ? (
+                <NavigationButton
+                    latitude={latitude}
+                    longitude={longitude}
+                    destinationName={name}
+                    size="small"
+                />
+            ) : (
+                <TouchableOpacity style={styles.arrowButton}>
+                    <Ionicons name="arrow-forward" size={20} color={Colors.textSecondary} />
+                </TouchableOpacity>
+            )}
         </TouchableOpacity>
     );
 }

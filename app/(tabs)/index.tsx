@@ -1,7 +1,7 @@
 import { FilterChip } from '@/components/filter-chip';
 import { GlowButton } from '@/components/glow-button';
 import MapComponent from '@/components/MapComponent';
-import { RestaurantCard } from '@/components/restaurant-card';
+import { RoutePreview } from '@/components/route-preview';
 import { CardShadow, Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -17,20 +17,55 @@ import {
   View
 } from 'react-native';
 
-// Sample restaurant for the card
-const FEATURED_RESTAURANT = {
-  name: 'The Green Room',
-  cuisine: 'Italian',
-  distance: '0.4mi',
-  rating: 4.8,
-  tag: 'QUIET',
-  imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200',
-};
+// Restaurant data with coordinates
+const RESTAURANTS = [
+  {
+    id: '1',
+    name: 'The Green Room',
+    cuisine: 'Italian',
+    distance: '0.4mi',
+    rating: 4.8,
+    tag: 'QUIET',
+    imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200',
+    latitude: 13.7463,
+    longitude: 100.5340,
+  },
+  {
+    id: '2',
+    name: 'Sakura Ramen House',
+    cuisine: 'Japanese',
+    distance: '0.7mi',
+    rating: 4.6,
+    tag: 'POPULAR',
+    latitude: 13.7400,
+    longitude: 100.5350,
+  },
+  {
+    id: '3',
+    name: 'Café Luna',
+    cuisine: 'French Café',
+    distance: '0.3mi',
+    rating: 4.9,
+    tag: 'QUIET',
+    latitude: 13.7580,
+    longitude: 100.5018,
+  },
+];
+
+interface SelectedRestaurant {
+  id: string;
+  name: string;
+  cuisine: string;
+  distance: string;
+  latitude: number;
+  longitude: number;
+}
 
 export default function HomeScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('now-open');
+  const [selectedRestaurant, setSelectedRestaurant] = useState<SelectedRestaurant | null>(null);
   const mapRef = React.useRef<any>(null);
 
   useEffect(() => {
@@ -66,12 +101,63 @@ export default function HomeScreen() {
     }
   };
 
+  const handleMarkerPress = (restaurant: any) => {
+    setSelectedRestaurant({
+      id: restaurant.id,
+      name: restaurant.name,
+      cuisine: restaurant.cuisine || '',
+      distance: restaurant.distance || '',
+      latitude: restaurant.latitude,
+      longitude: restaurant.longitude,
+    });
+
+    // Animate map to show route
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: restaurant.latitude,
+          longitude: restaurant.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        500
+      );
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedRestaurant(null);
+  };
+
+  // Generate simple route (straight line from user to destination)
+  const getRouteCoordinates = () => {
+    if (!location || !selectedRestaurant) return [];
+    return [
+      { latitude: location.coords.latitude, longitude: location.coords.longitude },
+      { latitude: selectedRestaurant.latitude, longitude: selectedRestaurant.longitude },
+    ];
+  };
+
+  const restaurantList = RESTAURANTS.map((r) => ({
+    id: r.id,
+    name: r.name,
+    latitude: r.latitude,
+    longitude: r.longitude,
+  }));
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
-      {/* Map Background */}
-      <MapComponent ref={mapRef} />
+      {/* Map Background with Markers */}
+      <MapComponent
+        ref={mapRef}
+        restaurants={restaurantList}
+        selectedRestaurantId={selectedRestaurant?.id}
+        onMarkerPress={handleMarkerPress}
+        route={getRouteCoordinates()}
+        showRoute={!!selectedRestaurant}
+      />
 
       {/* Dark Overlay for atmosphere */}
       <View style={styles.mapOverlay} pointerEvents="none" />
@@ -118,7 +204,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Bottom Section with FAB and Card */}
+        {/* Bottom Section with FAB and Card/Preview */}
         <View style={styles.bottomSection}>
           {/* Location FAB */}
           <View style={styles.fabContainer}>
@@ -130,15 +216,29 @@ export default function HomeScreen() {
             />
           </View>
 
-          {/* Featured Restaurant Card */}
-          <RestaurantCard
-            name={FEATURED_RESTAURANT.name}
-            cuisine={FEATURED_RESTAURANT.cuisine}
-            distance={FEATURED_RESTAURANT.distance}
-            rating={FEATURED_RESTAURANT.rating}
-            tag={FEATURED_RESTAURANT.tag}
-            imageUrl={FEATURED_RESTAURANT.imageUrl}
-          />
+          {/* Route Preview or Hint */}
+          {selectedRestaurant ? (
+            <RoutePreview
+              restaurantName={selectedRestaurant.name}
+              cuisine={selectedRestaurant.cuisine}
+              distance={selectedRestaurant.distance}
+              duration="5 min"
+              latitude={selectedRestaurant.latitude}
+              longitude={selectedRestaurant.longitude}
+              onClose={clearSelection}
+            />
+          ) : (
+            <View style={[styles.hintCard, CardShadow]}>
+              <Ionicons name="restaurant" size={20} color={Colors.neonGreen} />
+              <View style={styles.hintText}>
+                <TextInput
+                  style={styles.hintTitle}
+                  editable={false}
+                  value="Tap a marker to navigate"
+                />
+              </View>
+            </View>
+          )}
         </View>
       </SafeAreaView>
     </View>
@@ -152,7 +252,7 @@ const styles = StyleSheet.create({
   },
   mapOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
   },
   overlayContainer: {
     flex: 1,
@@ -199,5 +299,22 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingRight: 16,
     marginBottom: 16,
+  },
+  hintCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.darkGray,
+    marginHorizontal: 16,
+    padding: 16,
+    borderRadius: 16,
+    gap: 12,
+  },
+  hintText: {
+    flex: 1,
+  },
+  hintTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: Colors.textSecondary,
   },
 });

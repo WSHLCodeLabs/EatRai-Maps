@@ -15,7 +15,7 @@ import {
     View
 } from 'react-native';
 
-// Mock restaurant data
+// Mock restaurant data with coordinates around Bangkok
 const RESTAURANTS = [
     {
         id: '1',
@@ -25,6 +25,8 @@ const RESTAURANTS = [
         rating: 4.8,
         tag: 'QUIET',
         imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200',
+        latitude: 13.7463,
+        longitude: 100.5340,
     },
     {
         id: '2',
@@ -34,6 +36,8 @@ const RESTAURANTS = [
         rating: 4.6,
         tag: 'POPULAR',
         imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200',
+        latitude: 13.7400,
+        longitude: 100.5350,
     },
     {
         id: '3',
@@ -43,6 +47,8 @@ const RESTAURANTS = [
         rating: 4.9,
         tag: 'QUIET',
         imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200',
+        latitude: 13.7480,
+        longitude: 100.5410,
     },
     {
         id: '4',
@@ -52,6 +58,8 @@ const RESTAURANTS = [
         rating: 4.5,
         tag: 'BUSY',
         imageUrl: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=200',
+        latitude: 13.7520,
+        longitude: 100.4920,
     },
     {
         id: '5',
@@ -61,6 +69,8 @@ const RESTAURANTS = [
         rating: 4.7,
         tag: 'QUIET',
         imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=200',
+        latitude: 13.7580,
+        longitude: 100.5150,
     },
 ];
 
@@ -150,6 +160,8 @@ export default function RestaurantsScreen() {
                         rating={item.rating}
                         tag={item.tag}
                         imageUrl={item.imageUrl}
+                        latitude={item.latitude}
+                        longitude={item.longitude}
                     />
                 )}
                 ListEmptyComponent={
