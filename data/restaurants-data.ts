@@ -6,6 +6,14 @@
 // Crowd level type
 export type CrowdLevel = 'Quiet' | 'Moderate' | 'Busy';
 
+// Supabase crowd report row
+export interface CrowdReport {
+    id: string;
+    restaurant_id: string;
+    crowd_level: CrowdLevel;
+    created_at: string;
+}
+
 // Crowd reports structure
 export interface CrowdReports {
     quiet: number;
@@ -27,11 +35,39 @@ export interface Restaurant {
     crowdLevel: CrowdLevel;
 }
 
-// Helper function to calculate crowd level based on reports
+// Helper function to calculate crowd level based on local reports (legacy)
 export function calculateCrowdLevel(reports: CrowdReports): CrowdLevel {
     const { quiet, moderate, busy } = reports;
     if (busy >= quiet && busy >= moderate) return 'Busy';
     if (moderate >= quiet && moderate > busy) return 'Moderate';
+    return 'Quiet';
+}
+
+// Time weight: linear decay from 1.0 (just now) to 0.0 (30 min ago)
+const EXPIRY_MINUTES = 30;
+
+function getTimeWeight(createdAt: string): number {
+    const ageMinutes = (Date.now() - new Date(createdAt).getTime()) / 60000;
+    return Math.max(0, 1 - ageMinutes / EXPIRY_MINUTES);
+}
+
+// Weighted crowd level calculation from Supabase reports
+export function calculateCrowdLevelWeighted(reports: CrowdReport[]): CrowdLevel {
+    if (reports.length === 0) return 'Quiet';
+
+    let quietScore = 0;
+    let moderateScore = 0;
+    let busyScore = 0;
+
+    for (const report of reports) {
+        const weight = getTimeWeight(report.created_at);
+        if (report.crowd_level === 'Quiet') quietScore += weight;
+        else if (report.crowd_level === 'Moderate') moderateScore += weight;
+        else if (report.crowd_level === 'Busy') busyScore += weight;
+    }
+
+    if (busyScore >= moderateScore && busyScore >= quietScore) return 'Busy';
+    if (moderateScore >= quietScore) return 'Moderate';
     return 'Quiet';
 }
 

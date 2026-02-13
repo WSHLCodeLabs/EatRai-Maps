@@ -1,17 +1,17 @@
 import {
-    calculateCrowdLevel,
+    calculateCrowdLevelWeighted,
     CrowdLevel,
+    CrowdReport,
     INITIAL_RESTAURANTS,
     Restaurant,
 } from '@/data/restaurants-data';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '@/lib/supabase';
 import * as Location from 'expo-location';
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Platform, ToastAndroid } from 'react-native';
 
-const STORAGE_KEY = '@eatrai_crowd_reports';
-const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes in milliseconds
-const PROXIMITY_RADIUS = 500; // 500 meters - must be within this distance to report
+const REFRESH_INTERVAL = 2 * 60 * 1000; // 2 minutes — shared data needs faster refresh
+const PROXIMITY_RADIUS = 500; // 500 meters
 
 interface RestaurantContextType {
     restaurants: Restaurant[];
@@ -22,6 +22,7 @@ interface RestaurantContextType {
     checkProximity: (restaurantLat: number, restaurantLng: number) => Promise<boolean>;
     lastRefresh: Date | null;
     calculateDistanceToRestaurant: (restaurantLat: number, restaurantLng: number) => string;
+    refreshCrowdData: () => Promise<void>;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
@@ -37,7 +38,7 @@ const showToast = (message: string) => {
 
 // Calculate distance between two points in meters (Haversine formula)
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371e3; // Earth's radius in meters
+    const R = 6371e3;
     const φ1 = (lat1 * Math.PI) / 180;
     const φ2 = (lat2 * Math.PI) / 180;
     const Δφ = ((lat2 - lat1) * Math.PI) / 180;
@@ -62,9 +63,9 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
     const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
     const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // Load persisted data on mount and start auto-refresh
+    // Load data on mount and start auto-refresh
     useEffect(() => {
-        loadPersistedData();
+        fetchCrowdData();
         startLocationTracking();
         startAutoRefresh();
 
@@ -84,16 +85,14 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
                 return;
             }
 
-            // Get initial location
             const location = await Location.getCurrentPositionAsync({});
             setUserLocation(location);
 
-            // Watch for location updates
             Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.Balanced,
-                    timeInterval: 30000, // Update every 30 seconds
-                    distanceInterval: 50, // Or when moved 50 meters
+                    timeInterval: 30000,
+                    distanceInterval: 50,
                 },
                 (location) => {
                     setUserLocation(location);
@@ -104,75 +103,72 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
         }
     };
 
-    // Auto-refresh crowd data every 15 minutes
+    // Auto-refresh crowd data every 2 minutes
     const startAutoRefresh = () => {
         refreshIntervalRef.current = setInterval(() => {
-            refreshCrowdData();
+            fetchCrowdData();
         }, REFRESH_INTERVAL);
     };
 
-    // Refresh crowd data (reset to base values or fetch from server)
-    const refreshCrowdData = async () => {
-        console.log('🔄 Refreshing crowd data...');
-
-        // For now, we'll decay the reports slightly to simulate time-based decay
-        setRestaurants(prevRestaurants =>
-            prevRestaurants.map(restaurant => {
-                const newReports = {
-                    quiet: Math.max(0, Math.floor(restaurant.crowdReports.quiet * 0.8)),
-                    moderate: Math.max(0, Math.floor(restaurant.crowdReports.moderate * 0.8)),
-                    busy: Math.max(0, Math.floor(restaurant.crowdReports.busy * 0.8)),
-                };
-                return {
-                    ...restaurant,
-                    crowdReports: newReports,
-                    crowdLevel: calculateCrowdLevel(newReports),
-                };
-            })
-        );
-
-        setLastRefresh(new Date());
-        showToast('📊 Crowd data refreshed');
-    };
-
-    const loadPersistedData = async () => {
+    // Fetch crowd reports from Supabase (only last 30 minutes)
+    const fetchCrowdData = async () => {
         try {
-            const stored = await AsyncStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                const crowdData: Record<string, { crowdReports: Restaurant['crowdReports'] }> = JSON.parse(stored);
+            const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
-                setRestaurants(prevRestaurants =>
-                    prevRestaurants.map(restaurant => {
-                        const savedData = crowdData[restaurant.id];
-                        if (savedData) {
-                            return {
-                                ...restaurant,
-                                crowdReports: savedData.crowdReports,
-                                crowdLevel: calculateCrowdLevel(savedData.crowdReports),
-                            };
-                        }
-                        return restaurant;
-                    })
-                );
+            const { data: reports, error } = await supabase
+                .from('crowd_reports')
+                .select('*')
+                .gte('created_at', thirtyMinutesAgo)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Failed to fetch crowd data:', error.message);
+                return;
             }
+
+            // Group reports by restaurant_id
+            const reportsByRestaurant: Record<string, CrowdReport[]> = {};
+            for (const report of (reports || []) as CrowdReport[]) {
+                if (!reportsByRestaurant[report.restaurant_id]) {
+                    reportsByRestaurant[report.restaurant_id] = [];
+                }
+                reportsByRestaurant[report.restaurant_id].push(report);
+            }
+
+            // Update restaurants with weighted crowd levels
+            setRestaurants(prevRestaurants =>
+                prevRestaurants.map(restaurant => {
+                    const restaurantReports = reportsByRestaurant[restaurant.id] || [];
+                    const crowdLevel = calculateCrowdLevelWeighted(restaurantReports);
+
+                    // Count reports for display
+                    const crowdReports = {
+                        quiet: restaurantReports.filter(r => r.crowd_level === 'Quiet').length,
+                        moderate: restaurantReports.filter(r => r.crowd_level === 'Moderate').length,
+                        busy: restaurantReports.filter(r => r.crowd_level === 'Busy').length,
+                    };
+
+                    return {
+                        ...restaurant,
+                        crowdReports,
+                        crowdLevel,
+                    };
+                })
+            );
+
             setLastRefresh(new Date());
         } catch (error) {
-            console.error('Failed to load crowd data:', error);
+            console.error('Failed to fetch crowd data:', error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const persistData = async (updatedRestaurants: Restaurant[]) => {
-        try {
-            const crowdData: Record<string, { crowdReports: Restaurant['crowdReports'] }> = {};
-            updatedRestaurants.forEach(r => {
-                crowdData[r.id] = { crowdReports: r.crowdReports };
-            });
-            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(crowdData));
-        } catch (error) {
-            console.error('Failed to persist crowd data:', error);
-        }
+    // Refresh crowd data (exposed for manual refresh)
+    const refreshCrowdData = async () => {
+        console.log('🔄 Refreshing crowd data...');
+        await fetchCrowdData();
+        showToast('📊 Crowd data refreshed');
     };
 
     // Check if user is within proximity to report
@@ -180,7 +176,6 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
         try {
             let location = userLocation;
 
-            // Get fresh location if not available
             if (!location) {
                 location = await Location.getCurrentPositionAsync({});
                 setUserLocation(location);
@@ -211,34 +206,30 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
         }
     }, [userLocation]);
 
-    const reportCrowdLevel = useCallback((restaurantId: string, level: CrowdLevel) => {
-        setRestaurants(prevRestaurants => {
-            const updated = prevRestaurants.map(restaurant => {
-                if (restaurant.id === restaurantId) {
-                    const newReports = { ...restaurant.crowdReports };
+    // Report crowd level — INSERT into Supabase
+    const reportCrowdLevel = useCallback(async (restaurantId: string, level: CrowdLevel) => {
+        try {
+            const { error } = await supabase
+                .from('crowd_reports')
+                .insert({
+                    restaurant_id: restaurantId,
+                    crowd_level: level,
+                });
 
-                    // Increment the corresponding count
-                    if (level === 'Quiet') newReports.quiet += 1;
-                    else if (level === 'Moderate') newReports.moderate += 1;
-                    else if (level === 'Busy') newReports.busy += 1;
+            if (error) {
+                console.error('Failed to submit report:', error.message);
+                showToast('❌ Failed to submit report');
+                return;
+            }
 
-                    return {
-                        ...restaurant,
-                        crowdReports: newReports,
-                        crowdLevel: calculateCrowdLevel(newReports),
-                    };
-                }
-                return restaurant;
-            });
+            showToast('Thanks for your report! 🙏');
 
-            // Persist the updated data
-            persistData(updated);
-
-            return updated;
-        });
-
-        // Show confirmation toast
-        showToast('Thanks for your report! 🙏');
+            // Refresh data to reflect new report
+            await fetchCrowdData();
+        } catch (error) {
+            console.error('Failed to report crowd level:', error);
+            showToast('❌ Failed to submit report');
+        }
     }, []);
 
     const getRestaurantById = useCallback((id: string) => {
@@ -258,7 +249,6 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
             restaurantLng
         );
 
-        // Format distance
         if (distance < 1000) {
             return `${Math.round(distance)} m`;
         } else {
@@ -277,6 +267,7 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
                 checkProximity,
                 lastRefresh,
                 calculateDistanceToRestaurant,
+                refreshCrowdData,
             }}
         >
             {children}
