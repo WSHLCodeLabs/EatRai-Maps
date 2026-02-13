@@ -107,7 +107,15 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
                     <View style={styles.header}>
                         <View style={styles.imageContainer}>
                             {restaurant.imageUrl ? (
-                                <Image source={{ uri: restaurant.imageUrl }} style={styles.image} contentFit="cover" />
+                                <Image
+                                    source={
+                                        typeof restaurant.imageUrl === 'string'
+                                            ? { uri: restaurant.imageUrl }
+                                            : restaurant.imageUrl
+                                    }
+                                    style={styles.image}
+                                    contentFit="cover"
+                                />
                             ) : (
                                 <View style={[styles.image, styles.imagePlaceholder]}>
                                     <Ionicons name="restaurant" size={24} color={Colors.textSecondary} />
