@@ -156,6 +156,32 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         crowdReports: { quiet: 8, moderate: 4, busy: 2 },
         crowdLevel: 'Quiet',
     },
+    {
+        id: '9',
+        name: 'เจ๊มะขิ่น',
+        cuisine: 'Thai Food',
+        distance: '450 m',
+        rating: 4.5,
+        tag: 'NEW',
+        imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400',
+        latitude: 14.0110154,
+        longitude: 99.9958611,
+        crowdReports: { quiet: 5, moderate: 3, busy: 1 },
+        crowdLevel: 'Quiet',
+    },
+    {
+        id: '10',
+        name: 'เต้าหู้เย็นเป่าปิง',
+        cuisine: 'Dessert',
+        distance: '200 m',
+        rating: 4.5,
+        tag: 'NEW',
+        imageUrl: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400',
+        latitude: 14.0210961,
+        longitude: 99.9919658,
+        crowdReports: { quiet: 5, moderate: 3, busy: 1 },
+        crowdLevel: 'Quiet',
+    },
 ];
 
 // Export for backward compatibility
