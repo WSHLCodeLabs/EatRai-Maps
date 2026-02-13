@@ -1,0 +1,97 @@
+2026-02-13 23:32:49.004  7242-7294  AndroidRuntime          com.eatrai.maps                      E  FATAL EXCEPTION: mqt_v_native (Explain with AI)
+                                                                                                    Process: com.eatrai.maps, PID: 7242
+                                                                                                    com.facebook.react.common.JavascriptException: Error: useRestaurants must be used within a RestaurantProvider
+                                                                                                    
+                                                                                                    This error is located at:
+                                                                                                        at RestaurantDetailScreen (address at index.android.bundle:1:1625181)
+                                                                                                        at Suspense (<anonymous>)
+                                                                                                        at Route (address at index.android.bundle:1:943436)
+                                                                                                        at BaseRoute (address at index.android.bundle:1:950323)
+                                                                                                        at StaticContainer (address at index.android.bundle:1:914722)
+                                                                                                        at EnsureSingleNavigator (address at index.android.bundle:1:861482)
+                                                                                                        at SceneView (address at index.android.bundle:1:912519)
+                                                                                                        at RNSScreenContentWrapper (<anonymous>)
+                                                                                                        at ScreenContentWrapper (<anonymous>)
+                                                                                                        at DebugContainer (<anonymous>)
+                                                                                                        at RNSScreen (<anonymous>)
+                                                                                                        at Animated(Anonymous) (address at index.android.bundle:1:628122)
+                                                                                                        at Suspender (address at index.android.bundle:1:1025659)
+                                                                                                        at Suspense (<anonymous>)
+                                                                                                        at Freeze (address at index.android.bundle:1:1025720)
+                                                                                                        at DelayedFreeze (address at index.android.bundle:1:1025301)
+                                                                                                        at InnerScreen (address at index.android.bundle:1:1023017)
+                                                                                                        at anonymous (address at index.android.bundle:1:1024700)
+                                                                                                        at ScreenStackItem (address at index.android.bundle:1:1035219)
+                                                                                                        at SceneView (address at index.android.bundle:1:1058607)
+                                                                                                        at RNSScreenStack (<anonymous>)
+                                                                                                        at anonymous (address at index.android.bundle:1:1034298)
+                                                                                                        at ScreenStack (address at index.android.bundle:1:1033488)
+                                                                                                        at RCTView (<anonymous>)
+                                                                                                        at View (address at index.android.bundle:1:474878)
+                                                                                                        at FrameSizeProvider (address at index.android.bundle:1:996246)
+                                                                                                        at SafeAreaProviderCompat (address at index.android.bundle:1:1007767)
+                                                                                                        at NativeStackView (address at index.android.bundle:1:1057172)
+                                                                                                        at PreventRemoveProvider (address at index.android.bundle:1:892893)
+                                                                                                        at NavigationStateListenerProvider (address at index.android.bundle:1:920043)
+                                                                                                        at NavigationContent (address at index.android.bundle:1:909625)
+                                                                                                        at anonymous (address at index.android.bundle:1:909528)
+                                                                                                        at NativeStackNavigator (address at index.android.bundle:1:1053461)
+                                                                                                        at anonymous (address at index.android.bundle:1:942359)
+                                                                                                        at anonymous (address at index.android.bundle:1:833978)
+                                                                                                        at ThemeProvider (address at index.android.bundle:1:863638)
+                                                                                                        at RootLayout (address at index.android.bundle:1:1250043)
+                                                                                                        at Suspense (<anonymous>)
+                                                                                                        at Route (address at index.android.bundle:1:943436)
+                                                                                                        at BaseRoute (address at index.android.bundle:1:950323)
+                                                                                                        at StaticContainer (address at index.android.bundle:1:914722)
+                                                                                                        at EnsureSingleNavigator (address at index.android.bundle:1:861482)
+                                                                                                        at SceneView (address at index.android.bundle:1:912519)
+                                                                                                        at PreventRemoveProvider (address at index.android.bundle:1:892893)
+                                                                                                        at NavigationStateListenerProvider (address at index.android.bundle:1:920043)
+                                                                                                        at NavigationContent (address at index.android.bundle:1:909625)
+                                                                                                        at anonymous (address at index.android.bundle:1:909528)
+                                                                                                        at Content (address at index.android.bundle:1:1155850)
+                                                                                                        at RNCSafeAreaProvider (<anonymous>)
+                                                                                                        at SafeAreaProvider (address at index.android.bundle:1:992775)
+                                                                                                        at LinkPreviewContextProvider (address at index.android.bundle:1:1066761)
+                                                                                                        at anonymous (address at index.android.bundle:1:1154747)
+                                                                                                        at ThemeProvider (address at index.android.bundle:1:863638)
+                                                                                                        at EnsureSingleNavigator (address at index.android.bundle:1:861482)
+                                                                                                        at BaseNavigationContainer (address at index.android.bundle:1:840236)
+                                                                                                        at NavigationContainerInner (address at index.android.bundle:1:1157710)
+                                                                                                        at ContextNavigator (address at index.android.bundle:1:1154976)
+                                                                                                        at ExpoRoot (address at index.android.bundle:1:1154619)
+                                                                                                        at App (<anonymous>)
+                                                                                                        at RCTView (<anonymous>)
+                                                                                                        at View (address at index.android.bundle:1:474878)
+                                                                                                        at AppContainer (address at index.android.bundle:1:474206), stack:
+                                                                                                    useRestaurants@1:1167302
+                                                                                                    RestaurantDetailScreen@1:1625233
+                                                                                                    renderWithHooks@1:233914
+                                                                                                    updateFunctionComponent@1:252671
+2026-02-13 23:32:49.004  7242-7294  AndroidRuntime          com.eatrai.maps                      E  beginWork@1:260503 (Explain with AI)
+                                                                                                    performUnitOfWork@1:279138
+                                                                                                    workLoopSync@1:278146
+                                                                                                    renderRootSync@1:277978
+                                                                                                    performWorkOnRoot@1:275624
+                                                                                                    performSyncWorkOnRoot@1:229506
+                                                                                                    flushSyncWorkAcrossRoots_impl@1:228397
+                                                                                                    processRootScheduleInMicrotask@1:228757
+                                                                                                    anonymous@1:229601
+                                                                                                    
+                                                                                                    	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.kt:52)
+                                                                                                    	at com.facebook.jni.NativeRunnable.run(Native Method)
+                                                                                                    	at android.os.Handler.handleCallback(Handler.java:995)
+                                                                                                    	at android.os.Handler.dispatchMessage(Handler.java:103)
+                                                                                                    	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.kt:21)
+                                                                                                    	at android.os.Looper.loopOnce(Looper.java:283)
+                                                                                                    	at android.os.Looper.loop(Looper.java:392)
+                                                                                                    	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$Companion.startNewBackgroundThread$lambda$1(MessageQueueThreadImpl.kt:175)
+                                                                                                    	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$Companion.$r8$lambda$ldnZnqelhYFctGaUKkOKYj5rxo4(Unknown Source:0)
+                                                                                                    	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$Companion$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
+2026-02-13 23:32:49.004  7242-7242  HWUI                    com.eatrai.maps                      W  Image decoding logging dropped!
+2026-02-13 23:32:49.010  7242-7242  HWUI                    com.eatrai.maps                      W  Image decoding logging dropped!
+2026-02-13 23:32:49.012  7242-7294  Process                 com.eatrai.maps                      I  Sending signal. PID: 7242 SIG: 9
+2026-02-13 23:32:49.108  2607-2667  AppOps                  system_server                        E  Operation not started: uid=10361 pkg=com.eatrai.maps(null) op=GPS
+2026-02-13 23:32:49.126  2607-6084  AppOps                  system_server                        E  Operation not started: uid=10361 pkg=com.eatrai.maps(null) op=MONITOR_LOCATION

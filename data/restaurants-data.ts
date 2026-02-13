@@ -20,7 +20,7 @@ export interface Restaurant {
     distance: string;
     rating: number;
     tag: 'QUIET' | 'POPULAR' | 'BUSY' | 'NEW';
-    imageUrl: string;
+    imageUrl: string | number;
     latitude: number;
     longitude: number;
     crowdReports: CrowdReports;
@@ -59,7 +59,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '300 m',
         rating: 4.6,
         tag: 'POPULAR',
-        imageUrl: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400',
+        imageUrl: require('@/assets/images/restaurants/Kinkeng.png'),
         latitude: 14.017344401691004,
         longitude: 99.9927172382506,
         crowdReports: { quiet: 6, moderate: 3, busy: 1 },
@@ -72,7 +72,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '250 m',
         rating: 4.5,
         tag: 'POPULAR',
-        imageUrl: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400',
+        imageUrl: require('@/assets/images/restaurants/ytp.png'),
         latitude: 14.017632020102027,
         longitude: 99.99040176893497,
         crowdReports: { quiet: 4, moderate: 8, busy: 5 },
@@ -85,7 +85,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '400 m',
         rating: 4.4,
         tag: 'BUSY',
-        imageUrl: 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=400',
+        imageUrl: require('@/assets/images/restaurants/tr.png'),
         latitude: 14.019612962264643,
         longitude: 99.99146330941517,
         crowdReports: { quiet: 2, moderate: 5, busy: 9 },
@@ -98,7 +98,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '350 m',
         rating: 4.3,
         tag: 'QUIET',
-        imageUrl: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=400',
+        imageUrl: require('@/assets/images/restaurants/ds.png'),
         latitude: 14.019129897681074,
         longitude: 99.99177723837474,
         crowdReports: { quiet: 10, moderate: 4, busy: 2 },
@@ -111,7 +111,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '500 m',
         rating: 4.7,
         tag: 'POPULAR',
-        imageUrl: 'https://images.unsplash.com/photo-1547928578-bca3e9c5a8f5?w=400',
+        imageUrl: require('@/assets/images/restaurants/ttp.png'),
         latitude: 14.021139507656049,
         longitude: 99.99178282908903,
         crowdReports: { quiet: 3, moderate: 7, busy: 6 },
@@ -124,7 +124,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '200 m',
         rating: 4.5,
         tag: 'NEW',
-        imageUrl: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400',
+        imageUrl: require('@/assets/images/restaurants/sho.png'),
         latitude: 14.022419178653173,
         longitude: 99.9893362094152,
         crowdReports: { quiet: 5, moderate: 6, busy: 4 },
@@ -137,7 +137,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '600 m',
         rating: 4.4,
         tag: 'QUIET',
-        imageUrl: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400',
+        imageUrl: require('@/assets/images/restaurants/9rai.png'),
         latitude: 14.021960944522768,
         longitude: 99.98344601885749,
         crowdReports: { quiet: 12, moderate: 3, busy: 1 },
@@ -150,7 +150,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         distance: '800 m',
         rating: 4.3,
         tag: 'QUIET',
-        imageUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400',
+        imageUrl: require('@/assets/images/restaurants/rms.png'),
         latitude: 14.025928085995977,
         longitude: 99.9748996002541,
         crowdReports: { quiet: 8, moderate: 4, busy: 2 },

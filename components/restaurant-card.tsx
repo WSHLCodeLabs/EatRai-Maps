@@ -12,7 +12,7 @@ interface RestaurantCardProps {
     cuisine: string;
     distance: string;
     rating: number;
-    imageUrl?: string;
+    imageUrl?: string | number;
     tag?: string;
     latitude?: number;
     longitude?: number;
@@ -39,7 +39,15 @@ export function RestaurantCard({
             {/* Restaurant Image */}
             <View style={styles.imageContainer}>
                 {imageUrl ? (
-                    <Image source={{ uri: imageUrl }} style={styles.image} contentFit="cover" />
+                    <Image
+                        source={
+                            typeof imageUrl === 'string'
+                                ? { uri: imageUrl }
+                                : imageUrl
+                        }
+                        style={styles.image}
+                        contentFit="cover"
+                    />
                 ) : (
                     <View style={[styles.image, styles.imagePlaceholder]}>
                         <Ionicons name="restaurant" size={24} color={Colors.textSecondary} />

@@ -4,11 +4,9 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/theme';
-import { RestaurantProvider } from '@/context/RestaurantContext';
 
 export default function TabLayout() {
   return (
-    <RestaurantProvider>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors.neonGreen,
@@ -57,7 +55,6 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-    </RestaurantProvider>
   );
 }
 
