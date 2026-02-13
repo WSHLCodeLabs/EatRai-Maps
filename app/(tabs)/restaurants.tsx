@@ -5,6 +5,7 @@ import { Colors } from '@/constants/theme';
 import { useRestaurants } from '@/context/RestaurantContext';
 import { Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
     FlatList,
@@ -21,6 +22,7 @@ import {
 type FilterType = 'all' | 'quiet' | 'moderate' | 'busy' | 'nearby';
 
 export default function RestaurantsScreen() {
+    const router = useRouter();
     const { restaurants, calculateDistanceToRestaurant } = useRestaurants();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
@@ -120,6 +122,7 @@ export default function RestaurantsScreen() {
                         imageUrl={item.imageUrl}
                         latitude={item.latitude}
                         longitude={item.longitude}
+                        onPress={() => router.push(`/restaurant-detail?id=${item.id}` as any)}
                         onReportPress={() => handleReportPress(item)}
                     />
                 )}

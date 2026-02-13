@@ -9,6 +9,7 @@ import { useRestaurants } from '@/context/RestaurantContext';
 import { Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Platform,
@@ -22,6 +23,7 @@ import {
 } from 'react-native';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const { restaurants, calculateDistanceToRestaurant } = useRestaurants();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -201,9 +203,7 @@ export default function HomeScreen() {
               rating={featuredRestaurant.rating}
               crowdLevel={featuredRestaurant.crowdLevel}
               imageUrl={featuredRestaurant.imageUrl}
-              onPress={() => {
-                setSelectedRestaurant(featuredRestaurant);
-              }}
+              onPress={() => router.push(`/restaurant-detail?id=${featuredRestaurant.id}` as any)}
             />
           ) : null}
         </View>
