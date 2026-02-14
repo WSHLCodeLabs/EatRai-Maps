@@ -1,5 +1,5 @@
 import { CrowdLevelBadge } from '@/components/CrowdLevelBadge';
-import { Colors } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 import { Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -23,9 +23,11 @@ interface PromotedCardProps {
  * hero image, and CTA button.
  */
 export function PromotedCard({ restaurant, distance, onPress }: PromotedCardProps) {
+    const { colors } = useTheme();
+
     return (
         <TouchableOpacity
-            style={styles.card}
+            style={[styles.card, { backgroundColor: colors.card }]}
             onPress={onPress}
             activeOpacity={0.92}
         >
@@ -50,8 +52,8 @@ export function PromotedCard({ restaurant, distance, onPress }: PromotedCardProp
                         contentFit="cover"
                     />
                 ) : (
-                    <View style={[styles.heroImage, styles.imagePlaceholder]}>
-                        <Ionicons name="restaurant" size={32} color={Colors.textSecondary} />
+                    <View style={[styles.heroImage, styles.imagePlaceholder, { backgroundColor: colors.border }]}>
+                        <Ionicons name="restaurant" size={32} color={colors.textSecondary} />
                     </View>
                 )}
             </View>
@@ -59,23 +61,23 @@ export function PromotedCard({ restaurant, distance, onPress }: PromotedCardProp
             {/* Info Section */}
             <View style={styles.infoSection}>
                 <View style={styles.infoLeft}>
-                    <Text style={styles.name} numberOfLines={1}>
+                    <Text style={[styles.name, { color: colors.textPrimary }]} numberOfLines={1}>
                         {restaurant.name}
                     </Text>
-                    <Text style={styles.details}>
+                    <Text style={[styles.details, { color: colors.textSecondary }]}>
                         {restaurant.cuisine} • {distance}
                     </Text>
                     <View style={styles.ratingRow}>
-                        <Ionicons name="star" size={14} color={Colors.neonGreen} />
-                        <Text style={styles.rating}>{restaurant.rating.toFixed(1)}</Text>
+                        <Ionicons name="star" size={14} color={colors.accent} />
+                        <Text style={[styles.rating, { color: colors.textPrimary }]}>{restaurant.rating.toFixed(1)}</Text>
                         <CrowdLevelBadge level={restaurant.crowdLevel} size="small" />
                     </View>
                 </View>
 
                 {/* CTA Button */}
-                <TouchableOpacity style={styles.ctaButton} onPress={onPress}>
+                <TouchableOpacity style={[styles.ctaButton, { backgroundColor: colors.accent }]} onPress={onPress}>
                     <Text style={styles.ctaText}>View</Text>
-                    <Ionicons name="arrow-forward" size={14} color={Colors.deepBlack} />
+                    <Ionicons name="arrow-forward" size={14} color="#0D0D0D" />
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
@@ -86,7 +88,6 @@ const AMBER = '#F5A623';
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: Colors.darkGray,
         borderRadius: 16,
         marginHorizontal: 16,
         overflow: 'hidden',
@@ -129,7 +130,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     imagePlaceholder: {
-        backgroundColor: Colors.mediumGray,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -145,12 +145,10 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 16,
         fontWeight: '700',
-        color: Colors.textPrimary,
         marginBottom: 2,
     },
     details: {
         fontSize: 13,
-        color: Colors.textSecondary,
         marginBottom: 4,
     },
     ratingRow: {
@@ -160,7 +158,6 @@ const styles = StyleSheet.create({
     rating: {
         fontSize: 13,
         fontWeight: '600',
-        color: Colors.textPrimary,
         marginLeft: 4,
         marginRight: 8,
     },
@@ -168,7 +165,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: Colors.neonGreen,
         paddingHorizontal: 14,
         paddingVertical: 10,
         borderRadius: 10,
@@ -176,6 +172,6 @@ const styles = StyleSheet.create({
     ctaText: {
         fontSize: 13,
         fontWeight: '700',
-        color: Colors.deepBlack,
+        color: '#0D0D0D',
     },
 });

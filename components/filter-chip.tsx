@@ -1,4 +1,5 @@
-import { Colors, NeonGlow } from '@/constants/theme';
+import { NeonGlow } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
@@ -11,12 +12,15 @@ interface FilterChipProps {
 }
 
 export function FilterChip({ icon, text, active = false, onPress }: FilterChipProps) {
+    const { colors } = useTheme();
+
     return (
         <TouchableOpacity
             style={[
                 styles.chip,
-                active ? styles.chipActive : styles.chipInactive,
-                active && NeonGlow,
+                active
+                    ? [{ backgroundColor: colors.accent }, NeonGlow]
+                    : { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
             ]}
             onPress={onPress}
             activeOpacity={0.7}
@@ -24,10 +28,10 @@ export function FilterChip({ icon, text, active = false, onPress }: FilterChipPr
             <Ionicons
                 name={icon}
                 size={14}
-                color={active ? Colors.deepBlack : Colors.textPrimary}
+                color={active ? '#0D0D0D' : colors.textPrimary}
                 style={styles.icon}
             />
-            <Text style={[styles.text, active ? styles.textActive : styles.textInactive]}>
+            <Text style={[styles.text, { color: active ? '#0D0D0D' : colors.textPrimary }]}>
                 {text}
             </Text>
         </TouchableOpacity>
@@ -43,25 +47,11 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginRight: 8,
     },
-    chipActive: {
-        backgroundColor: Colors.neonGreen,
-    },
-    chipInactive: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: Colors.mediumGray,
-    },
     icon: {
         marginRight: 6,
     },
     text: {
         fontSize: 13,
         fontWeight: '600',
-    },
-    textActive: {
-        color: Colors.deepBlack,
-    },
-    textInactive: {
-        color: Colors.textPrimary,
     },
 });

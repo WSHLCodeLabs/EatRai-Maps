@@ -1,6 +1,6 @@
 import { CrowdLevelBadge } from '@/components/CrowdLevelBadge';
-import { CardShadow, Colors } from '@/constants/theme';
 import { useRestaurants } from '@/context/RestaurantContext';
+import { useTheme } from '@/context/ThemeContext';
 import { CROWD_COLORS, CrowdLevel, Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -23,6 +23,7 @@ interface CrowdReportModalProps {
 
 export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportModalProps) {
     const { reportCrowdLevel, checkProximity } = useRestaurants();
+    const { colors } = useTheme();
     const [isNearby, setIsNearby] = useState<boolean | null>(null);
     const [isChecking, setIsChecking] = useState(false);
 
@@ -66,8 +67,9 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
             <TouchableOpacity
                 style={[
                     styles.reportButton,
+                    { backgroundColor: colors.background },
                     {
-                        borderColor: isDisabled ? Colors.mediumGray : color,
+                        borderColor: isDisabled ? colors.border : color,
                         shadowColor: isDisabled ? 'transparent' : color,
                         shadowOffset: { width: 0, height: 0 },
                         shadowOpacity: isDisabled ? 0 : 0.5,
@@ -80,9 +82,9 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
                 activeOpacity={0.8}
                 disabled={isDisabled}
             >
-                <Ionicons name={icon as any} size={24} color={isDisabled ? Colors.textSecondary : color} />
-                <Text style={[styles.reportButtonText, { color: isDisabled ? Colors.textSecondary : color }]}>{level}</Text>
-                <Text style={styles.reportCount}>
+                <Ionicons name={icon as any} size={24} color={isDisabled ? colors.textSecondary : color} />
+                <Text style={[styles.reportButtonText, { color: isDisabled ? colors.textSecondary : color }]}>{level}</Text>
+                <Text style={[styles.reportCount, { color: colors.textSecondary }]}>
                     {restaurant.crowdReports[level.toLowerCase() as keyof typeof restaurant.crowdReports]} reports
                 </Text>
             </TouchableOpacity>
@@ -97,10 +99,10 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
             onRequestClose={onClose}
         >
             <Pressable style={styles.overlay} onPress={onClose}>
-                <Pressable style={[styles.modal, CardShadow]} onPress={e => e.stopPropagation()}>
+                <Pressable style={[styles.modal, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={e => e.stopPropagation()}>
                     {/* Close Button */}
-                    <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                        <Ionicons name="close" size={24} color={Colors.textSecondary} />
+                    <TouchableOpacity style={[styles.closeButton, { backgroundColor: colors.border }]} onPress={onClose}>
+                        <Ionicons name="close" size={24} color={colors.textSecondary} />
                     </TouchableOpacity>
 
                     {/* Restaurant Header */}
@@ -117,50 +119,50 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
                                     contentFit="cover"
                                 />
                             ) : (
-                                <View style={[styles.image, styles.imagePlaceholder]}>
-                                    <Ionicons name="restaurant" size={24} color={Colors.textSecondary} />
+                                <View style={[styles.image, styles.imagePlaceholder, { backgroundColor: colors.border }]}>
+                                    <Ionicons name="restaurant" size={24} color={colors.textSecondary} />
                                 </View>
                             )}
                         </View>
                         <View style={styles.headerInfo}>
-                            <Text style={styles.name} numberOfLines={1}>{restaurant.name}</Text>
-                            <Text style={styles.cuisine}>{restaurant.cuisine} • {restaurant.distance}</Text>
+                            <Text style={[styles.name, { color: colors.textPrimary }]} numberOfLines={1}>{restaurant.name}</Text>
+                            <Text style={[styles.cuisine, { color: colors.textSecondary }]}>{restaurant.cuisine} • {restaurant.distance}</Text>
                             <View style={styles.ratingRow}>
-                                <Ionicons name="star" size={14} color={Colors.neonGreen} />
-                                <Text style={styles.rating}>{restaurant.rating.toFixed(1)}</Text>
+                                <Ionicons name="star" size={14} color={colors.accent} />
+                                <Text style={[styles.rating, { color: colors.textPrimary }]}>{restaurant.rating.toFixed(1)}</Text>
                                 <CrowdLevelBadge level={restaurant.crowdLevel} size="small" />
                             </View>
                         </View>
                     </View>
 
                     {/* Divider */}
-                    <View style={styles.divider} />
+                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
                     {/* Proximity Status */}
                     {isChecking ? (
-                        <View style={styles.proximityStatus}>
-                            <ActivityIndicator size="small" color={Colors.neonGreen} />
-                            <Text style={styles.proximityText}>Checking your location...</Text>
+                        <View style={[styles.proximityStatus, { backgroundColor: colors.background }]}>
+                            <ActivityIndicator size="small" color={colors.accent} />
+                            <Text style={[styles.proximityText, { color: colors.textSecondary }]}>Checking your location...</Text>
                         </View>
                     ) : isNearby === false ? (
-                        <View style={styles.proximityStatus}>
+                        <View style={[styles.proximityStatus, { backgroundColor: colors.background }]}>
                             <Ionicons name="location-outline" size={20} color="#FF6B6B" />
                             <Text style={[styles.proximityText, { color: '#FF6B6B' }]}>
                                 You must be near this restaurant to report
                             </Text>
                         </View>
                     ) : isNearby === true ? (
-                        <View style={styles.proximityStatus}>
-                            <Ionicons name="checkmark-circle" size={20} color={Colors.neonGreen} />
-                            <Text style={[styles.proximityText, { color: Colors.neonGreen }]}>
+                        <View style={[styles.proximityStatus, { backgroundColor: colors.background }]}>
+                            <Ionicons name="checkmark-circle" size={20} color={colors.accent} />
+                            <Text style={[styles.proximityText, { color: colors.accent }]}>
                                 You're nearby! You can report.
                             </Text>
                         </View>
                     ) : null}
 
                     {/* Report Section */}
-                    <Text style={styles.reportTitle}>Report Current Crowd Level</Text>
-                    <Text style={styles.reportSubtitle}>Help others know how busy it is right now</Text>
+                    <Text style={[styles.reportTitle, { color: colors.textPrimary }]}>Report Current Crowd Level</Text>
+                    <Text style={[styles.reportSubtitle, { color: colors.textSecondary }]}>Help others know how busy it is right now</Text>
 
                     {/* Report Buttons */}
                     <View style={styles.reportButtons}>
@@ -172,8 +174,8 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
                     {/* Retry Button if not nearby */}
                     {isNearby === false && (
                         <TouchableOpacity style={styles.retryButton} onPress={checkUserProximity}>
-                            <Ionicons name="refresh" size={16} color={Colors.neonGreen} />
-                            <Text style={styles.retryText}>Retry Location Check</Text>
+                            <Ionicons name="refresh" size={16} color={colors.accent} />
+                            <Text style={[styles.retryText, { color: colors.accent }]}>Retry Location Check</Text>
                         </TouchableOpacity>
                     )}
                 </Pressable>
@@ -193,11 +195,9 @@ const styles = StyleSheet.create({
     modal: {
         width: '100%',
         maxWidth: 360,
-        backgroundColor: Colors.darkGray,
         borderRadius: 20,
         padding: 20,
         borderWidth: 1,
-        borderColor: Colors.mediumGray,
     },
     closeButton: {
         position: 'absolute',
@@ -206,7 +206,6 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: Colors.mediumGray,
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,
@@ -227,7 +226,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     imagePlaceholder: {
-        backgroundColor: Colors.mediumGray,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -239,12 +237,10 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 18,
         fontWeight: '700',
-        color: Colors.textPrimary,
         marginBottom: 4,
     },
     cuisine: {
         fontSize: 13,
-        color: Colors.textSecondary,
         marginBottom: 6,
     },
     ratingRow: {
@@ -255,12 +251,10 @@ const styles = StyleSheet.create({
     rating: {
         fontSize: 13,
         fontWeight: '600',
-        color: Colors.textPrimary,
         marginRight: 8,
     },
     divider: {
         height: 1,
-        backgroundColor: Colors.mediumGray,
         marginVertical: 16,
     },
     proximityStatus: {
@@ -271,23 +265,19 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         paddingVertical: 10,
         paddingHorizontal: 16,
-        backgroundColor: Colors.deepBlack,
         borderRadius: 10,
     },
     proximityText: {
         fontSize: 13,
-        color: Colors.textSecondary,
     },
     reportTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: Colors.textPrimary,
         textAlign: 'center',
         marginBottom: 4,
     },
     reportSubtitle: {
         fontSize: 13,
-        color: Colors.textSecondary,
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -298,7 +288,6 @@ const styles = StyleSheet.create({
     },
     reportButton: {
         flex: 1,
-        backgroundColor: Colors.deepBlack,
         borderRadius: 12,
         padding: 14,
         alignItems: 'center',
@@ -311,7 +300,6 @@ const styles = StyleSheet.create({
     },
     reportCount: {
         fontSize: 10,
-        color: Colors.textSecondary,
         marginTop: 4,
     },
     retryButton: {
@@ -324,7 +312,6 @@ const styles = StyleSheet.create({
     },
     retryText: {
         fontSize: 13,
-        color: Colors.neonGreen,
         fontWeight: '600',
     },
 });

@@ -1,8 +1,8 @@
 import { CrowdReportModal } from '@/components/CrowdReportModal';
 import { FilterChip } from '@/components/filter-chip';
 import { RestaurantCard } from '@/components/restaurant-card';
-import { Colors } from '@/constants/theme';
 import { useRestaurants } from '@/context/RestaurantContext';
+import { useTheme } from '@/context/ThemeContext';
 import { Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -24,6 +24,7 @@ type FilterType = 'all' | 'quiet' | 'moderate' | 'busy' | 'nearby';
 export default function RestaurantsScreen() {
     const router = useRouter();
     const { restaurants, calculateDistanceToRestaurant } = useRestaurants();
+    const { colors } = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
@@ -51,27 +52,29 @@ export default function RestaurantsScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.title}>Restaurants</Text>
-                <Text style={styles.subtitle}>Near KU Kamphaeng Saen • {filteredRestaurants.length} places</Text>
+                <Text style={[styles.title, { color: colors.textPrimary }]}>Restaurants</Text>
+                <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                    Near KU Kamphaeng Saen • {filteredRestaurants.length} places
+                </Text>
             </View>
 
             {/* Search Bar */}
             <View style={styles.searchContainer}>
-                <View style={styles.searchBar}>
-                    <Ionicons name="search" size={20} color={Colors.textSecondary} />
+                <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <Ionicons name="search" size={20} color={colors.textSecondary} />
                     <TextInput
-                        style={styles.searchInput}
+                        style={[styles.searchInput, { color: colors.textPrimary }]}
                         placeholder="Search restaurants..."
-                        placeholderTextColor={Colors.textSecondary}
+                        placeholderTextColor={colors.textSecondary}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                     />
                     {searchQuery.length > 0 && (
                         <TouchableOpacity onPress={() => setSearchQuery('')}>
-                            <Ionicons name="close-circle" size={20} color={Colors.textSecondary} />
+                            <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -79,30 +82,10 @@ export default function RestaurantsScreen() {
 
             {/* Filter Chips */}
             <View style={styles.filterContainer}>
-                <FilterChip
-                    icon="apps"
-                    text="All"
-                    active={activeFilter === 'all'}
-                    onPress={() => setActiveFilter('all')}
-                />
-                <FilterChip
-                    icon="leaf"
-                    text="Quiet"
-                    active={activeFilter === 'quiet'}
-                    onPress={() => setActiveFilter('quiet')}
-                />
-                <FilterChip
-                    icon="people"
-                    text="Moderate"
-                    active={activeFilter === 'moderate'}
-                    onPress={() => setActiveFilter('moderate')}
-                />
-                <FilterChip
-                    icon="flame"
-                    text="Busy"
-                    active={activeFilter === 'busy'}
-                    onPress={() => setActiveFilter('busy')}
-                />
+                <FilterChip icon="apps" text="All" active={activeFilter === 'all'} onPress={() => setActiveFilter('all')} />
+                <FilterChip icon="leaf" text="Quiet" active={activeFilter === 'quiet'} onPress={() => setActiveFilter('quiet')} />
+                <FilterChip icon="people" text="Moderate" active={activeFilter === 'moderate'} onPress={() => setActiveFilter('moderate')} />
+                <FilterChip icon="flame" text="Busy" active={activeFilter === 'busy'} onPress={() => setActiveFilter('busy')} />
             </View>
 
             {/* Restaurant List */}
@@ -128,8 +111,8 @@ export default function RestaurantsScreen() {
                 )}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Ionicons name="restaurant-outline" size={48} color={Colors.textMuted} />
-                        <Text style={styles.emptyText}>No restaurants found</Text>
+                        <Ionicons name="restaurant-outline" size={48} color={colors.textMuted} />
+                        <Text style={[styles.emptyText, { color: colors.textMuted }]}>No restaurants found</Text>
                     </View>
                 }
             />
@@ -147,7 +130,6 @@ export default function RestaurantsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.deepBlack,
     },
     header: {
         paddingHorizontal: 20,
@@ -157,11 +139,9 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: '700',
-        color: Colors.textPrimary,
     },
     subtitle: {
         fontSize: 14,
-        color: Colors.textSecondary,
         marginTop: 4,
     },
     searchContainer: {
@@ -171,17 +151,14 @@ const styles = StyleSheet.create({
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: Colors.darkGray,
         borderRadius: 12,
         paddingHorizontal: 14,
         height: 48,
         borderWidth: 1,
-        borderColor: Colors.mediumGray,
     },
     searchInput: {
         flex: 1,
         fontSize: 15,
-        color: Colors.textPrimary,
         marginLeft: 10,
     },
     filterContainer: {
@@ -202,7 +179,6 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: Colors.textMuted,
         marginTop: 12,
     },
 });

@@ -28,7 +28,7 @@ export default function LoginScreen() {
     };
 
     const handleSignUp = () => {
-        router.push('/signup');
+        router.push('/signup' as any);
     };
 
     const handleForgotPassword = () => {

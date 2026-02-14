@@ -1,8 +1,8 @@
 import { CrowdLevelBadge } from '@/components/CrowdLevelBadge';
 import { CrowdReportModal } from '@/components/CrowdReportModal';
 import { NavigationButton } from '@/components/navigation-button';
-import { CardShadow, Colors, SubtleGlow } from '@/constants/theme';
 import { useRestaurants } from '@/context/RestaurantContext';
+import { useTheme } from '@/context/ThemeContext';
 import { CROWD_COLORS } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -22,16 +22,17 @@ export default function RestaurantDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { getRestaurantById, calculateDistanceToRestaurant } = useRestaurants();
+    const { isDarkMode, colors } = useTheme();
     const [modalVisible, setModalVisible] = useState(false);
 
     const restaurant = id ? getRestaurantById(id) : undefined;
 
     if (!restaurant) {
         return (
-            <View style={styles.errorContainer}>
-                <Ionicons name="alert-circle-outline" size={64} color={Colors.textSecondary} />
-                <Text style={styles.errorText}>Restaurant not found</Text>
-                <TouchableOpacity style={styles.backButtonError} onPress={() => router.back()}>
+            <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
+                <Ionicons name="alert-circle-outline" size={64} color={colors.textSecondary} />
+                <Text style={[styles.errorText, { color: colors.textSecondary }]}>Restaurant not found</Text>
+                <TouchableOpacity style={[styles.backButtonError, { backgroundColor: colors.accent }]} onPress={() => router.back()}>
                     <Text style={styles.backButtonErrorText}>Go Back</Text>
                 </TouchableOpacity>
             </View>
@@ -42,8 +43,8 @@ export default function RestaurantDetailScreen() {
     const crowdColor = CROWD_COLORS[restaurant.crowdLevel];
 
     return (
-        <View style={styles.container}>
-            <StatusBar barStyle="light-content" />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
             <ScrollView style={styles.scrollView} bounces={false}>
                 {/* Hero Image */}
                 <View style={styles.heroContainer}>
@@ -58,8 +59,8 @@ export default function RestaurantDetailScreen() {
                             contentFit="cover"
                         />
                     ) : (
-                        <View style={[styles.heroImage, styles.heroPlaceholder]}>
-                            <Ionicons name="restaurant" size={64} color={Colors.textSecondary} />
+                        <View style={[styles.heroImage, styles.heroPlaceholder, { backgroundColor: colors.card }]}>
+                            <Ionicons name="restaurant" size={64} color={colors.textSecondary} />
                         </View>
                     )}
                     {/* Gradient overlay at bottom of image */}
@@ -70,7 +71,7 @@ export default function RestaurantDetailScreen() {
                         style={styles.backButton}
                         onPress={() => router.back()}
                     >
-                        <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
+                        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
                     </TouchableOpacity>
 
                     {/* Crowd Badge on hero */}
@@ -82,38 +83,38 @@ export default function RestaurantDetailScreen() {
                 {/* Content */}
                 <View style={styles.content}>
                     {/* Name & Cuisine */}
-                    <Text style={styles.name}>{restaurant.name}</Text>
-                    <Text style={styles.cuisine}>{restaurant.cuisine}</Text>
+                    <Text style={[styles.name, { color: colors.textPrimary }]}>{restaurant.name}</Text>
+                    <Text style={[styles.cuisine, { color: colors.textSecondary }]}>{restaurant.cuisine}</Text>
 
                     {/* Stats Row */}
                     <View style={styles.statsRow}>
                         {/* Rating */}
-                        <View style={[styles.statCard, CardShadow]}>
-                            <Ionicons name="star" size={20} color={Colors.neonGreen} />
-                            <Text style={styles.statValue}>{restaurant.rating.toFixed(1)}</Text>
-                            <Text style={styles.statLabel}>Rating</Text>
+                        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
+                            <Ionicons name="star" size={20} color={colors.accent} />
+                            <Text style={[styles.statValue, { color: colors.textPrimary }]}>{restaurant.rating.toFixed(1)}</Text>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Rating</Text>
                         </View>
 
                         {/* Distance */}
-                        <View style={[styles.statCard, CardShadow]}>
-                            <Ionicons name="location" size={20} color={Colors.neonGreen} />
-                            <Text style={styles.statValue}>{distance}</Text>
-                            <Text style={styles.statLabel}>Distance</Text>
+                        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
+                            <Ionicons name="location" size={20} color={colors.accent} />
+                            <Text style={[styles.statValue, { color: colors.textPrimary }]}>{distance}</Text>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Distance</Text>
                         </View>
 
                         {/* Crowd */}
-                        <View style={[styles.statCard, CardShadow]}>
+                        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
                             <Ionicons name="people" size={20} color={crowdColor} />
                             <Text style={[styles.statValue, { color: crowdColor }]}>
                                 {restaurant.crowdLevel}
                             </Text>
-                            <Text style={styles.statLabel}>Right Now</Text>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Right Now</Text>
                         </View>
                     </View>
 
                     {/* Crowd Reports Section */}
-                    <View style={[styles.section, CardShadow]}>
-                        <Text style={styles.sectionTitle}>Crowd Reports</Text>
+                    <View style={[styles.section, { backgroundColor: colors.card }]}>
+                        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Crowd Reports</Text>
                         <View style={styles.crowdBars}>
                             <CrowdBar
                                 label="Quiet"
@@ -124,6 +125,8 @@ export default function RestaurantDetailScreen() {
                                     restaurant.crowdReports.busy
                                 }
                                 color={CROWD_COLORS.Quiet}
+                                trackColor={colors.border}
+                                countColor={colors.textSecondary}
                             />
                             <CrowdBar
                                 label="Moderate"
@@ -134,6 +137,8 @@ export default function RestaurantDetailScreen() {
                                     restaurant.crowdReports.busy
                                 }
                                 color={CROWD_COLORS.Moderate}
+                                trackColor={colors.border}
+                                countColor={colors.textSecondary}
                             />
                             <CrowdBar
                                 label="Busy"
@@ -144,24 +149,26 @@ export default function RestaurantDetailScreen() {
                                     restaurant.crowdReports.busy
                                 }
                                 color={CROWD_COLORS.Busy}
+                                trackColor={colors.border}
+                                countColor={colors.textSecondary}
                             />
                         </View>
                         <TouchableOpacity
-                            style={[styles.reportButton, SubtleGlow]}
+                            style={[styles.reportButton, { backgroundColor: colors.accent }]}
                             onPress={() => setModalVisible(true)}
                         >
-                            <Ionicons name="megaphone" size={18} color={Colors.deepBlack} />
+                            <Ionicons name="megaphone" size={18} color="#0D0D0D" />
                             <Text style={styles.reportButtonText}>Report Crowd Level</Text>
                         </TouchableOpacity>
                     </View>
 
                     {/* Location Section */}
-                    <View style={[styles.section, CardShadow]}>
-                        <Text style={styles.sectionTitle}>Location</Text>
+                    <View style={[styles.section, { backgroundColor: colors.card }]}>
+                        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Location</Text>
                         <View style={styles.locationRow}>
                             <View style={styles.locationInfo}>
-                                <Ionicons name="navigate-outline" size={18} color={Colors.textSecondary} />
-                                <Text style={styles.locationText}>
+                                <Ionicons name="navigate-outline" size={18} color={colors.textSecondary} />
+                                <Text style={[styles.locationText, { color: colors.textSecondary }]}>
                                     {restaurant.latitude.toFixed(6)}, {restaurant.longitude.toFixed(6)}
                                 </Text>
                             </View>
@@ -197,18 +204,22 @@ function CrowdBar({
     count,
     total,
     color,
+    trackColor,
+    countColor,
 }: {
     label: string;
     count: number;
     total: number;
     color: string;
+    trackColor: string;
+    countColor: string;
 }) {
     const percentage = total > 0 ? (count / total) * 100 : 0;
 
     return (
         <View style={styles.crowdBarRow}>
             <Text style={[styles.crowdBarLabel, { color }]}>{label}</Text>
-            <View style={styles.crowdBarTrack}>
+            <View style={[styles.crowdBarTrack, { backgroundColor: trackColor }]}>
                 <View
                     style={[
                         styles.crowdBarFill,
@@ -216,7 +227,7 @@ function CrowdBar({
                     ]}
                 />
             </View>
-            <Text style={styles.crowdBarCount}>{count}</Text>
+            <Text style={[styles.crowdBarCount, { color: countColor }]}>{count}</Text>
         </View>
     );
 }
@@ -224,7 +235,6 @@ function CrowdBar({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.deepBlack,
     },
     scrollView: {
         flex: 1,
@@ -232,27 +242,24 @@ const styles = StyleSheet.create({
     // Error state
     errorContainer: {
         flex: 1,
-        backgroundColor: Colors.deepBlack,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 32,
     },
     errorText: {
         fontSize: 18,
-        color: Colors.textSecondary,
         marginTop: 16,
     },
     backButtonError: {
         marginTop: 24,
         paddingHorizontal: 24,
         paddingVertical: 12,
-        backgroundColor: Colors.neonGreen,
         borderRadius: 12,
     },
     backButtonErrorText: {
         fontSize: 16,
         fontWeight: '600',
-        color: Colors.deepBlack,
+        color: '#0D0D0D',
     },
     // Hero
     heroContainer: {
@@ -265,7 +272,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     heroPlaceholder: {
-        backgroundColor: Colors.darkGray,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -276,7 +282,6 @@ const styles = StyleSheet.create({
         right: 0,
         height: 80,
         backgroundColor: 'transparent',
-        // Simulated gradient overlay via shadow
         borderTopWidth: 0,
     },
     backButton: {
@@ -303,12 +308,10 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 28,
         fontWeight: '700',
-        color: Colors.textPrimary,
         marginBottom: 4,
     },
     cuisine: {
         fontSize: 16,
-        color: Colors.textSecondary,
         marginBottom: 20,
     },
     // Stats
@@ -319,7 +322,6 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: Colors.darkGray,
         borderRadius: 16,
         padding: 16,
         alignItems: 'center',
@@ -328,15 +330,12 @@ const styles = StyleSheet.create({
     statValue: {
         fontSize: 18,
         fontWeight: '700',
-        color: Colors.textPrimary,
     },
     statLabel: {
         fontSize: 12,
-        color: Colors.textSecondary,
     },
     // Sections
     section: {
-        backgroundColor: Colors.darkGray,
         borderRadius: 16,
         padding: 20,
         marginBottom: 16,
@@ -344,7 +343,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: Colors.textPrimary,
         marginBottom: 16,
     },
     // Crowd bars
@@ -365,7 +363,6 @@ const styles = StyleSheet.create({
     crowdBarTrack: {
         flex: 1,
         height: 8,
-        backgroundColor: Colors.mediumGray,
         borderRadius: 4,
         overflow: 'hidden',
     },
@@ -376,7 +373,6 @@ const styles = StyleSheet.create({
     crowdBarCount: {
         width: 24,
         fontSize: 13,
-        color: Colors.textSecondary,
         textAlign: 'right',
     },
     // Report button
@@ -384,7 +380,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: Colors.neonGreen,
         borderRadius: 12,
         paddingVertical: 14,
         gap: 8,
@@ -392,7 +387,7 @@ const styles = StyleSheet.create({
     reportButtonText: {
         fontSize: 15,
         fontWeight: '600',
-        color: Colors.deepBlack,
+        color: '#0D0D0D',
     },
     // Location
     locationRow: {
@@ -408,6 +403,5 @@ const styles = StyleSheet.create({
     },
     locationText: {
         fontSize: 13,
-        color: Colors.textSecondary,
     },
 });

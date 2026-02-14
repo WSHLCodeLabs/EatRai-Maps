@@ -1,4 +1,5 @@
-import { CardShadow, Colors, NeonGlow } from '@/constants/theme';
+import { NeonGlow } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -28,24 +29,26 @@ export function RoutePreview({
     longitude,
     onClose,
 }: RoutePreviewProps) {
+    const { colors } = useTheme();
+
     return (
-        <View style={[styles.container, CardShadow]}>
+        <View style={[styles.container, { backgroundColor: colors.card }]}>
             {/* Handle bar */}
-            <View style={styles.handleBar} />
+            <View style={[styles.handleBar, { backgroundColor: colors.border }]} />
 
             {/* Restaurant Info */}
             <View style={styles.header}>
                 <View style={styles.info}>
-                    <Text style={styles.name} numberOfLines={1}>
+                    <Text style={[styles.name, { color: colors.textPrimary }]} numberOfLines={1}>
                         {restaurantName}
                     </Text>
-                    <Text style={styles.cuisine}>{cuisine}</Text>
+                    <Text style={[styles.cuisine, { color: colors.textSecondary }]}>{cuisine}</Text>
                 </View>
                 {onClose && (
                     <Ionicons
                         name="close"
                         size={24}
-                        color={Colors.textSecondary}
+                        color={colors.textSecondary}
                         onPress={onClose}
                     />
                 )}
@@ -54,23 +57,23 @@ export function RoutePreview({
             {/* Route Stats */}
             <View style={styles.statsRow}>
                 <View style={styles.stat}>
-                    <View style={[styles.statIcon, NeonGlow]}>
-                        <Ionicons name="walk" size={18} color={Colors.deepBlack} />
+                    <View style={[styles.statIcon, { backgroundColor: colors.accent }, NeonGlow]}>
+                        <Ionicons name="walk" size={18} color="#0D0D0D" />
                     </View>
                     <View>
-                        <Text style={styles.statValue}>{distance}</Text>
-                        <Text style={styles.statLabel}>Distance</Text>
+                        <Text style={[styles.statValue, { color: colors.textPrimary }]}>{distance}</Text>
+                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Distance</Text>
                     </View>
                 </View>
 
                 {duration && (
                     <View style={styles.stat}>
-                        <View style={[styles.statIcon, NeonGlow]}>
-                            <Ionicons name="time" size={18} color={Colors.deepBlack} />
+                        <View style={[styles.statIcon, { backgroundColor: colors.accent }, NeonGlow]}>
+                            <Ionicons name="time" size={18} color="#0D0D0D" />
                         </View>
                         <View>
-                            <Text style={styles.statValue}>{duration}</Text>
-                            <Text style={styles.statLabel}>Est. Time</Text>
+                            <Text style={[styles.statValue, { color: colors.textPrimary }]}>{duration}</Text>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Est. Time</Text>
                         </View>
                     </View>
                 )}
@@ -90,7 +93,6 @@ export function RoutePreview({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: Colors.darkGray,
         borderRadius: 24,
         padding: 20,
         paddingBottom: Platform.OS === 'ios' ? 28 : 20,
@@ -99,7 +101,6 @@ const styles = StyleSheet.create({
     handleBar: {
         width: 36,
         height: 4,
-        backgroundColor: Colors.mediumGray,
         borderRadius: 2,
         alignSelf: 'center',
         marginBottom: 16,
@@ -117,11 +118,9 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 20,
         fontWeight: '700',
-        color: Colors.textPrimary,
     },
     cuisine: {
         fontSize: 14,
-        color: Colors.textSecondary,
         marginTop: 2,
     },
     statsRow: {
@@ -138,17 +137,14 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: Colors.neonGreen,
         alignItems: 'center',
         justifyContent: 'center',
     },
     statValue: {
         fontSize: 16,
         fontWeight: '600',
-        color: Colors.textPrimary,
     },
     statLabel: {
         fontSize: 12,
-        color: Colors.textSecondary,
     },
 });

@@ -30,7 +30,7 @@ export default function SignUpScreen() {
     };
 
     const handleLogin = () => {
-        router.push('/login');
+        router.push('/login' as any);
     };
 
     return (

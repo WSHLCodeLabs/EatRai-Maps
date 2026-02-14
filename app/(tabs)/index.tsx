@@ -4,8 +4,9 @@ import { GlowButton } from '@/components/glow-button';
 import MapComponent from '@/components/MapComponent';
 import { PromotedCard } from '@/components/promoted-card';
 import { RoutePreview } from '@/components/route-preview';
-import { CardShadow, Colors } from '@/constants/theme';
+import { CardShadow } from '@/constants/theme';
 import { useRestaurants } from '@/context/RestaurantContext';
+import { useTheme } from '@/context/ThemeContext';
 import { Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -25,6 +26,7 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
   const { restaurants, calculateDistanceToRestaurant } = useRestaurants();
+  const { isDarkMode, colors } = useTheme();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('now-open');
@@ -117,7 +119,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor="transparent" translucent />
 
       {/* Map Background with Markers (no route line) */}
       <MapComponent
@@ -134,14 +136,14 @@ export default function HomeScreen() {
         {/* Top Search Section */}
         <View style={styles.topSection}>
           {/* Search Bar */}
-          <View style={[styles.searchBarContainer, CardShadow]}>
+          <View style={[styles.searchBarContainer, CardShadow, { backgroundColor: isDarkMode ? 'rgba(26, 26, 26, 0.9)' : 'rgba(255, 255, 255, 0.95)', borderColor: colors.border }]}>
             <TextInput
               placeholder="Find quiet spots, ramen, cafes..."
-              style={styles.searchInput}
-              placeholderTextColor={Colors.textSecondary}
+              style={[styles.searchInput, { color: colors.textPrimary }]}
+              placeholderTextColor={colors.textSecondary}
             />
-            <TouchableOpacity style={styles.filterButton}>
-              <Ionicons name="options-outline" size={20} color={Colors.textPrimary} />
+            <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.border }]}>
+              <Ionicons name="options-outline" size={20} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
 
@@ -218,7 +220,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.deepBlack,
+    backgroundColor: '#0D0D0D',
   },
   mapOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -235,24 +237,20 @@ const styles = StyleSheet.create({
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(26, 26, 26, 0.9)',
     marginHorizontal: 16,
     height: 50,
     borderRadius: 25,
     paddingHorizontal: 20,
     borderWidth: 1,
-    borderColor: Colors.mediumGray,
   },
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: Colors.textPrimary,
   },
   filterButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Colors.mediumGray,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,

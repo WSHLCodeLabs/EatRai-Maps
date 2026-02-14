@@ -1,5 +1,5 @@
 import { CrowdLevelBadge } from '@/components/CrowdLevelBadge';
-import { CardShadow, Colors, SubtleGlow } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 import { CROWD_COLORS, CrowdLevel } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -34,8 +34,14 @@ export function RestaurantCard({
     onPress,
     onReportPress,
 }: RestaurantCardProps) {
+    const { colors } = useTheme();
+
     return (
-        <TouchableOpacity style={[styles.card, CardShadow]} onPress={onPress} activeOpacity={0.9}>
+        <TouchableOpacity
+            style={[styles.card, { backgroundColor: colors.card }]}
+            onPress={onPress}
+            activeOpacity={0.9}
+        >
             {/* Restaurant Image */}
             <View style={styles.imageContainer}>
                 {imageUrl ? (
@@ -49,27 +55,27 @@ export function RestaurantCard({
                         contentFit="cover"
                     />
                 ) : (
-                    <View style={[styles.image, styles.imagePlaceholder]}>
-                        <Ionicons name="restaurant" size={24} color={Colors.textSecondary} />
+                    <View style={[styles.image, styles.imagePlaceholder, { backgroundColor: colors.border }]}>
+                        <Ionicons name="restaurant" size={24} color={colors.textSecondary} />
                     </View>
                 )}
             </View>
 
             {/* Restaurant Info */}
             <View style={styles.info}>
-                <Text style={styles.name} numberOfLines={1}>
+                <Text style={[styles.name, { color: colors.textPrimary }]} numberOfLines={1}>
                     {name}
                 </Text>
-                <Text style={styles.details}>
+                <Text style={[styles.details, { color: colors.textSecondary }]}>
                     {cuisine} • {distance}
                 </Text>
                 <View style={styles.ratingRow}>
-                    <Ionicons name="star" size={14} color={Colors.neonGreen} />
-                    <Text style={styles.rating}>{rating.toFixed(1)}</Text>
+                    <Ionicons name="star" size={14} color={colors.accent} />
+                    <Text style={[styles.rating, { color: colors.textPrimary }]}>{rating.toFixed(1)}</Text>
                     {crowdLevel ? (
                         <CrowdLevelBadge level={crowdLevel} size="small" />
                     ) : tag && (
-                        <View style={[styles.tag, SubtleGlow]}>
+                        <View style={[styles.tag, { backgroundColor: colors.accent }]}>
                             <Text style={styles.tagText}>{tag}</Text>
                         </View>
                     )}
@@ -83,6 +89,7 @@ export function RestaurantCard({
                     <TouchableOpacity
                         style={[
                             styles.reportButton,
+                            { backgroundColor: colors.border },
                             crowdLevel && { borderColor: CROWD_COLORS[crowdLevel] }
                         ]}
                         onPress={onReportPress}
@@ -90,7 +97,7 @@ export function RestaurantCard({
                         <Ionicons
                             name="megaphone"
                             size={18}
-                            color={crowdLevel ? CROWD_COLORS[crowdLevel] : Colors.neonGreen}
+                            color={crowdLevel ? CROWD_COLORS[crowdLevel] : colors.accent}
                         />
                     </TouchableOpacity>
                 )}
@@ -104,8 +111,11 @@ export function RestaurantCard({
                         size="small"
                     />
                 ) : (
-                    <TouchableOpacity style={styles.arrowButton} onPress={onPress}>
-                        <Ionicons name="arrow-forward" size={20} color={Colors.textSecondary} />
+                    <TouchableOpacity
+                        style={[styles.arrowButton, { backgroundColor: colors.border }]}
+                        onPress={onPress}
+                    >
+                        <Ionicons name="arrow-forward" size={20} color={colors.textSecondary} />
                     </TouchableOpacity>
                 )}
             </View>
@@ -117,7 +127,6 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: Colors.darkGray,
         borderRadius: 16,
         padding: 12,
         marginHorizontal: 16,
@@ -133,7 +142,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     imagePlaceholder: {
-        backgroundColor: Colors.mediumGray,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -144,12 +152,10 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 16,
         fontWeight: '600',
-        color: Colors.textPrimary,
         marginBottom: 2,
     },
     details: {
         fontSize: 13,
-        color: Colors.textSecondary,
         marginBottom: 4,
     },
     ratingRow: {
@@ -159,12 +165,10 @@ const styles = StyleSheet.create({
     rating: {
         fontSize: 13,
         fontWeight: '600',
-        color: Colors.textPrimary,
         marginLeft: 4,
         marginRight: 8,
     },
     tag: {
-        backgroundColor: Colors.neonGreen,
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 4,
@@ -172,13 +176,12 @@ const styles = StyleSheet.create({
     tagText: {
         fontSize: 10,
         fontWeight: '700',
-        color: Colors.deepBlack,
+        color: '#0D0D0D',
     },
     arrowButton: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: Colors.mediumGray,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -191,10 +194,8 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: Colors.mediumGray,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: Colors.neonGreen,
     },
 });
