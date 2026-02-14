@@ -3,6 +3,7 @@ import { FilterChip } from '@/components/filter-chip';
 import { GlowButton } from '@/components/glow-button';
 import MapComponent from '@/components/MapComponent';
 import { PromotedCard } from '@/components/promoted-card';
+import { RandomPickerModal } from '@/components/RandomPickerModal';
 import { RoutePreview } from '@/components/route-preview';
 import { CardShadow } from '@/constants/theme';
 import { useRestaurants } from '@/context/RestaurantContext';
@@ -11,16 +12,17 @@ import { Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function HomeScreen() {
@@ -32,7 +34,22 @@ export default function HomeScreen() {
   const [activeFilter, setActiveFilter] = useState<string>('now-open');
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [randomPickerVisible, setRandomPickerVisible] = useState(false);
   const mapRef = React.useRef<any>(null);
+
+  // Restaurants with available seats (Quiet or Moderate)
+  const availableRestaurants = useMemo(
+    () => restaurants.filter(r => r.crowdLevel === 'Quiet' || r.crowdLevel === 'Moderate'),
+    [restaurants]
+  );
+
+  const handleRandomPick = () => {
+    if (availableRestaurants.length === 0) {
+      Alert.alert('ไม่มีร้านที่ว่าง', 'ร้านอาหารทุกร้านอยู่ในสถานะแน่น ลองใหม่ภายหลังนะ');
+      return;
+    }
+    setRandomPickerVisible(true);
+  };
 
   // Promoted restaurant (first promoted, or fallback to first)
   const promotedRestaurant = restaurants.find(r => r.isPromoted) || restaurants[0];
@@ -176,8 +193,14 @@ export default function HomeScreen() {
 
         {/* Bottom Section with FAB and Navigation/Card */}
         <View style={styles.bottomSection}>
-          {/* Location FAB */}
+          {/* FAB Buttons */}
           <View style={styles.fabContainer}>
+            <GlowButton
+              icon="dice"
+              size={52}
+              glowIntensity="high"
+              onPress={handleRandomPick}
+            />
             <GlowButton
               icon="locate"
               size={52}
@@ -212,6 +235,18 @@ export default function HomeScreen() {
         visible={modalVisible}
         restaurant={selectedRestaurant}
         onClose={handleCloseModal}
+      />
+
+      {/* Random Picker Modal */}
+      <RandomPickerModal
+        visible={randomPickerVisible}
+        availableRestaurants={availableRestaurants}
+        distance={calculateDistanceToRestaurant}
+        onClose={() => setRandomPickerVisible(false)}
+        onNavigate={(restaurant) => {
+          setRandomPickerVisible(false);
+          router.push(`/restaurant-detail?id=${restaurant.id}` as any);
+        }}
       />
     </View>
   );
@@ -267,5 +302,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingRight: 16,
     marginBottom: 16,
+    gap: 10,
   },
 });
