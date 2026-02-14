@@ -6,12 +6,15 @@ import {
     Restaurant,
 } from '@/data/restaurants-data';
 import { supabase } from '@/lib/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Platform, ToastAndroid } from 'react-native';
 
 const REFRESH_INTERVAL = 2 * 60 * 1000; // 2 minutes — shared data needs faster refresh
 const PROXIMITY_RADIUS = 500; // 500 meters
+const REPORT_COOLDOWN = 15 * 60 * 1000; // 15 minutes per restaurant
+const COOLDOWN_STORAGE_PREFIX = 'crowd_report_cooldown_';
 
 interface RestaurantContextType {
     restaurants: Restaurant[];
@@ -23,6 +26,7 @@ interface RestaurantContextType {
     lastRefresh: Date | null;
     calculateDistanceToRestaurant: (restaurantLat: number, restaurantLng: number) => string;
     refreshCrowdData: () => Promise<void>;
+    getCooldownRemaining: (restaurantId: string) => Promise<number>;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
@@ -206,9 +210,41 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
         }
     }, [userLocation]);
 
-    // Report crowd level — INSERT into Supabase
+    // Cooldown helpers — per-restaurant rate limit via AsyncStorage
+    const getCooldownRemaining = useCallback(async (restaurantId: string): Promise<number> => {
+        try {
+            const stored = await AsyncStorage.getItem(`${COOLDOWN_STORAGE_PREFIX}${restaurantId}`);
+            if (!stored) return 0;
+
+            const lastReportTime = parseInt(stored, 10);
+            const elapsed = Date.now() - lastReportTime;
+            const remaining = REPORT_COOLDOWN - elapsed;
+
+            return remaining > 0 ? remaining : 0;
+        } catch {
+            return 0;
+        }
+    }, []);
+
+    const setLastReportTime = useCallback(async (restaurantId: string) => {
+        try {
+            await AsyncStorage.setItem(`${COOLDOWN_STORAGE_PREFIX}${restaurantId}`, Date.now().toString());
+        } catch (error) {
+            console.error('Failed to save cooldown:', error);
+        }
+    }, []);
+
+    // Report crowd level — INSERT into Supabase (with cooldown check)
     const reportCrowdLevel = useCallback(async (restaurantId: string, level: CrowdLevel) => {
         try {
+            // Check cooldown first
+            const remaining = await getCooldownRemaining(restaurantId);
+            if (remaining > 0) {
+                const minutes = Math.ceil(remaining / 60000);
+                showToast(`⏳ Please wait ${minutes} min before reporting again`);
+                return;
+            }
+
             const { error } = await supabase
                 .from('crowd_reports')
                 .insert({
@@ -222,6 +258,9 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
                 return;
             }
 
+            // Save cooldown timestamp
+            await setLastReportTime(restaurantId);
+
             showToast('Thanks for your report! 🙏');
 
             // Refresh data to reflect new report
@@ -230,7 +269,7 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
             console.error('Failed to report crowd level:', error);
             showToast('❌ Failed to submit report');
         }
-    }, []);
+    }, [getCooldownRemaining, setLastReportTime]);
 
     const getRestaurantById = useCallback((id: string) => {
         return restaurants.find(r => r.id === id);
@@ -268,6 +307,7 @@ export function RestaurantProvider({ children }: RestaurantProviderProps) {
                 lastRefresh,
                 calculateDistanceToRestaurant,
                 refreshCrowdData,
+                getCooldownRemaining,
             }}
         >
             {children}

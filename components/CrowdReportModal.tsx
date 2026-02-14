@@ -4,7 +4,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { CROWD_COLORS, CrowdLevel, Restaurant } from '@/data/restaurants-data';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Modal,
@@ -22,20 +22,68 @@ interface CrowdReportModalProps {
 }
 
 export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportModalProps) {
-    const { reportCrowdLevel, checkProximity } = useRestaurants();
+    const { reportCrowdLevel, checkProximity, getCooldownRemaining } = useRestaurants();
     const { colors } = useTheme();
     const [isNearby, setIsNearby] = useState<boolean | null>(null);
     const [isChecking, setIsChecking] = useState(false);
+    const [cooldownSeconds, setCooldownSeconds] = useState(0);
+    const cooldownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // Check proximity when modal opens
+    // Check proximity and cooldown when modal opens
     useEffect(() => {
         if (visible && restaurant) {
             checkUserProximity();
+            checkCooldown();
         } else {
             setIsNearby(null);
             setIsChecking(false);
+            setCooldownSeconds(0);
+            if (cooldownTimerRef.current) {
+                clearInterval(cooldownTimerRef.current);
+                cooldownTimerRef.current = null;
+            }
         }
+
+        return () => {
+            if (cooldownTimerRef.current) {
+                clearInterval(cooldownTimerRef.current);
+                cooldownTimerRef.current = null;
+            }
+        };
     }, [visible, restaurant]);
+
+    const checkCooldown = async () => {
+        if (!restaurant) return;
+        const remaining = await getCooldownRemaining(restaurant.id);
+        if (remaining > 0) {
+            setCooldownSeconds(Math.ceil(remaining / 1000));
+            startCooldownTimer();
+        } else {
+            setCooldownSeconds(0);
+        }
+    };
+
+    const startCooldownTimer = () => {
+        if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+        cooldownTimerRef.current = setInterval(() => {
+            setCooldownSeconds(prev => {
+                if (prev <= 1) {
+                    if (cooldownTimerRef.current) {
+                        clearInterval(cooldownTimerRef.current);
+                        cooldownTimerRef.current = null;
+                    }
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+    const formatCooldown = (seconds: number): string => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
 
     const checkUserProximity = async () => {
         if (!restaurant) return;
@@ -48,20 +96,24 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
 
     if (!restaurant) return null;
 
+    const isCooldownActive = cooldownSeconds > 0;
+
     const handleReport = async (level: CrowdLevel) => {
+        if (isCooldownActive) return;
+
         if (!isNearby) {
             // Re-check proximity before reporting
             const nearby = await checkProximity(restaurant.latitude, restaurant.longitude);
             if (!nearby) return;
         }
 
-        reportCrowdLevel(restaurant.id, level);
+        await reportCrowdLevel(restaurant.id, level);
         onClose();
     };
 
     const ReportButton = ({ level, icon }: { level: CrowdLevel; icon: string }) => {
         const color = CROWD_COLORS[level];
-        const isDisabled = isChecking || !isNearby;
+        const isDisabled = isChecking || !isNearby || isCooldownActive;
 
         return (
             <TouchableOpacity
@@ -159,6 +211,16 @@ export function CrowdReportModal({ visible, restaurant, onClose }: CrowdReportMo
                             </Text>
                         </View>
                     ) : null}
+
+                    {/* Cooldown Status */}
+                    {isCooldownActive && (
+                        <View style={[styles.cooldownStatus, { backgroundColor: colors.background }]}>
+                            <Ionicons name="time-outline" size={20} color="#FF9F43" />
+                            <Text style={[styles.cooldownText, { color: '#FF9F43' }]}>
+                                {`Wait ${formatCooldown(cooldownSeconds)} before reporting again`}
+                            </Text>
+                        </View>
+                    )}
 
                     {/* Report Section */}
                     <Text style={[styles.reportTitle, { color: colors.textPrimary }]}>Report Current Crowd Level</Text>
@@ -269,6 +331,20 @@ const styles = StyleSheet.create({
     },
     proximityText: {
         fontSize: 13,
+    },
+    cooldownStatus: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        marginBottom: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 10,
+    },
+    cooldownText: {
+        fontSize: 13,
+        fontWeight: '600',
     },
     reportTitle: {
         fontSize: 16,
