@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import {
     FlatList,
     Platform,
+    RefreshControl,
     SafeAreaView,
     StatusBar,
     StyleSheet,
@@ -23,12 +24,19 @@ type FilterType = 'all' | 'quiet' | 'moderate' | 'busy' | 'nearby';
 
 export default function RestaurantsScreen() {
     const router = useRouter();
-    const { restaurants, calculateDistanceToRestaurant } = useRestaurants();
+    const { restaurants, calculateDistanceToRestaurant, refreshCrowdData } = useRestaurants();
     const { colors } = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        await refreshCrowdData();
+        setIsRefreshing(false);
+    };
 
     const filteredRestaurants = restaurants.filter((restaurant) => {
         const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -94,6 +102,15 @@ export default function RestaurantsScreen() {
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isRefreshing}
+                        onRefresh={handleRefresh}
+                        tintColor={colors.accent}
+                        colors={[colors.accent]}
+                        progressBackgroundColor={colors.card}
+                    />
+                }
                 ItemSeparatorComponent={() => <View style={styles.separator} />}
                 renderItem={({ item }) => (
                     <RestaurantCard
