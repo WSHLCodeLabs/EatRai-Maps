@@ -33,6 +33,7 @@ export interface Restaurant {
     longitude: number;
     crowdReports: CrowdReports;
     crowdLevel: CrowdLevel;
+    isPromoted?: boolean;
 }
 
 // Helper function to calculate crowd level based on local reports (legacy)
@@ -100,6 +101,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         longitude: 99.9927172382506,
         crowdReports: { quiet: 6, moderate: 3, busy: 1 },
         crowdLevel: 'Quiet',
+        isPromoted: true,
     },
     {
         id: '2',

@@ -2,7 +2,7 @@ import { CrowdReportModal } from '@/components/CrowdReportModal';
 import { FilterChip } from '@/components/filter-chip';
 import { GlowButton } from '@/components/glow-button';
 import MapComponent from '@/components/MapComponent';
-import { RestaurantCard } from '@/components/restaurant-card';
+import { PromotedCard } from '@/components/promoted-card';
 import { RoutePreview } from '@/components/route-preview';
 import { CardShadow, Colors } from '@/constants/theme';
 import { useRestaurants } from '@/context/RestaurantContext';
@@ -12,14 +12,14 @@ import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 export default function HomeScreen() {
@@ -32,8 +32,8 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const mapRef = React.useRef<any>(null);
 
-  // Featured restaurant (first one)
-  const featuredRestaurant = restaurants[0];
+  // Promoted restaurant (first promoted, or fallback to first)
+  const promotedRestaurant = restaurants.find(r => r.isPromoted) || restaurants[0];
 
   useEffect(() => {
     (async () => {
@@ -184,7 +184,7 @@ export default function HomeScreen() {
             />
           </View>
 
-          {/* Route Preview when marker selected, otherwise Featured Card */}
+          {/* Route Preview when marker selected, otherwise Promoted Card */}
           {selectedRestaurant ? (
             <RoutePreview
               restaurantName={selectedRestaurant.name}
@@ -195,15 +195,11 @@ export default function HomeScreen() {
               longitude={selectedRestaurant.longitude}
               onClose={clearSelection}
             />
-          ) : featuredRestaurant ? (
-            <RestaurantCard
-              name={featuredRestaurant.name}
-              cuisine={featuredRestaurant.cuisine}
-              distance={calculateDistanceToRestaurant(featuredRestaurant.latitude, featuredRestaurant.longitude)}
-              rating={featuredRestaurant.rating}
-              crowdLevel={featuredRestaurant.crowdLevel}
-              imageUrl={featuredRestaurant.imageUrl}
-              onPress={() => router.push(`/restaurant-detail?id=${featuredRestaurant.id}` as any)}
+          ) : promotedRestaurant ? (
+            <PromotedCard
+              restaurant={promotedRestaurant}
+              distance={calculateDistanceToRestaurant(promotedRestaurant.latitude, promotedRestaurant.longitude)}
+              onPress={() => router.push(`/restaurant-detail?id=${promotedRestaurant.id}` as any)}
             />
           ) : null}
         </View>
