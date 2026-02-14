@@ -9,8 +9,8 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
     Platform,
+    RefreshControl,
     ScrollView,
     StatusBar,
     StyleSheet,
@@ -53,7 +53,18 @@ export default function RestaurantDetailScreen() {
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-            <ScrollView style={styles.scrollView} bounces={false}>
+            <ScrollView
+                style={styles.scrollView}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isRefreshing}
+                        onRefresh={handleRefresh}
+                        tintColor={colors.accent}
+                        colors={[colors.accent]}
+                        progressBackgroundColor={colors.card}
+                    />
+                }
+            >
                 {/* Hero Image */}
                 <View style={styles.heroContainer}>
                     {restaurant.imageUrl ? (
@@ -122,21 +133,7 @@ export default function RestaurantDetailScreen() {
 
                     {/* Crowd Reports Section */}
                     <View style={[styles.section, { backgroundColor: colors.card }]}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={[styles.sectionTitle, { color: colors.textPrimary, marginBottom: 0 }]}>Crowd Reports</Text>
-                            <TouchableOpacity
-                                style={[styles.refreshButton, { backgroundColor: colors.background }]}
-                                onPress={handleRefresh}
-                                disabled={isRefreshing}
-                                activeOpacity={0.7}
-                            >
-                                {isRefreshing ? (
-                                    <ActivityIndicator size="small" color={colors.accent} />
-                                ) : (
-                                    <Ionicons name="refresh" size={18} color={colors.accent} />
-                                )}
-                            </TouchableOpacity>
-                        </View>
+                        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Crowd Reports</Text>
                         <View style={styles.crowdBars}>
                             <CrowdBar
                                 label="Quiet"
@@ -367,19 +364,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 16,
     },
-    sectionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 16,
-    },
-    refreshButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+
     // Crowd bars
     crowdBars: {
         gap: 12,
