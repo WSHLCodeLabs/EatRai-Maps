@@ -2,10 +2,14 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ProfileScreen() {
     const { isDarkMode, toggleTheme, colors } = useTheme();
+
+    const handleMenuPress = (label: string) => {
+        Alert.alert(label, `"${label}" feature coming soon!`);
+    };
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -25,6 +29,7 @@ export default function ProfileScreen() {
                 <TouchableOpacity
                     style={[styles.signInButton, { backgroundColor: colors.accent }]}
                     onPress={() => router.push('/login' as any)}
+                    activeOpacity={0.7}
                 >
                     <Ionicons name="log-in-outline" size={20} color={isDarkMode ? '#0D0D0D' : '#FFFFFF'} />
                     <Text style={[styles.signInText, { color: isDarkMode ? '#0D0D0D' : '#FFFFFF' }]}>Sign In</Text>
@@ -40,14 +45,14 @@ export default function ProfileScreen() {
 
                 {/* Menu Items */}
                 <View style={[styles.menuSection, { backgroundColor: colors.card }]}>
-                    <MenuItem icon="heart-outline" label="Saved Places" colors={colors} />
-                    <MenuItem icon="time-outline" label="Recent Searches" colors={colors} />
-                    <MenuItem icon="star-outline" label="My Reviews" colors={colors} />
+                    <MenuItem icon="heart-outline" label="Saved Places" colors={colors} onPress={() => handleMenuPress('Saved Places')} />
+                    <MenuItem icon="time-outline" label="Recent Searches" colors={colors} onPress={() => handleMenuPress('Recent Searches')} />
+                    <MenuItem icon="star-outline" label="My Reviews" colors={colors} onPress={() => handleMenuPress('My Reviews')} />
                 </View>
 
                 <View style={[styles.menuSection, { backgroundColor: colors.card }]}>
-                    <MenuItem icon="settings-outline" label="Settings" colors={colors} />
-                    <MenuItem icon="notifications-outline" label="Notifications" colors={colors} />
+                    <MenuItem icon="settings-outline" label="Settings" colors={colors} onPress={() => handleMenuPress('Settings')} />
+                    <MenuItem icon="notifications-outline" label="Notifications" colors={colors} onPress={() => handleMenuPress('Notifications')} />
                     {/* Dark Mode Toggle */}
                     <View style={[styles.menuItem, { borderBottomColor: colors.border }]}>
                         <Ionicons name="moon-outline" size={22} color={colors.textSecondary} />
@@ -62,8 +67,8 @@ export default function ProfileScreen() {
                 </View>
 
                 <View style={[styles.menuSection, { backgroundColor: colors.card }]}>
-                    <MenuItem icon="help-circle-outline" label="Help & Support" colors={colors} />
-                    <MenuItem icon="information-circle-outline" label="About" colors={colors} />
+                    <MenuItem icon="help-circle-outline" label="Help & Support" colors={colors} onPress={() => handleMenuPress('Help & Support')} />
+                    <MenuItem icon="information-circle-outline" label="About" colors={colors} onPress={() => handleMenuPress('About')} />
                 </View>
 
                 {/* App Version */}
@@ -77,11 +82,16 @@ interface MenuItemProps {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
     colors: { textSecondary: string; textPrimary: string; textMuted: string; border: string };
+    onPress?: () => void;
 }
 
-function MenuItem({ icon, label, colors }: MenuItemProps) {
+function MenuItem({ icon, label, colors, onPress }: MenuItemProps) {
     return (
-        <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+        <TouchableOpacity
+            style={[styles.menuItem, { borderBottomColor: colors.border }]}
+            onPress={onPress}
+            activeOpacity={0.6}
+        >
             <Ionicons name={icon} size={22} color={colors.textSecondary} />
             <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>{label}</Text>
             <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
