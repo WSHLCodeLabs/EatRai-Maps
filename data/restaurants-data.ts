@@ -246,6 +246,32 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
         crowdReports: { quiet: 5, moderate: 3, busy: 1 },
         crowdLevel: 'Quiet',
     },
+    {
+        id: '13',
+        name: 'โรงอาหารนนทรีฟู้ดเซ็นเตอร์ (โรงส้ม)',
+        cuisine: 'Canteen',
+        distance: '200 m',
+        rating: 4.3,
+        tag: 'NEW',
+        imageUrl: require('@/assets/images/restaurants/canteenku2.png'),
+        latitude: 14.027726702862799,
+        longitude: 99.97876507040137,
+        crowdReports: { quiet: 5, moderate: 3, busy: 1 },
+        crowdLevel: 'Quiet',
+    },
+    {
+        id: '14',
+        name: 'โรงอาหารกลาง 1',
+        cuisine: 'Canteen',
+        distance: '200 m',
+        rating: 4.3,
+        tag: 'NEW',
+        imageUrl: require('@/assets/images/restaurants/canteenku1.png'),
+        latitude: 14.022297061531729,
+        longitude: 99.97642627557903,
+        crowdReports: { quiet: 5, moderate: 3, busy: 1 },
+        crowdLevel: 'Quiet',
+    },
 ];
 
 // Export for backward compatibility
