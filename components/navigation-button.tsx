@@ -1,4 +1,5 @@
 import { Colors, SubtleGlow } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import React, { useState } from 'react';
@@ -57,6 +58,7 @@ export function NavigationButton({
     variant = 'icon',
 }: NavigationButtonProps) {
     const [showModal, setShowModal] = useState(false);
+    const { colors } = useTheme();
 
     const sizeConfig = {
         small: { button: 32, icon: 16 },
@@ -142,9 +144,9 @@ export function NavigationButton({
                     style={styles.modalOverlay}
                     onPress={() => setShowModal(false)}
                 >
-                    <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
-                        <Text style={styles.modalTitle}>Navigate to</Text>
-                        <Text style={styles.modalSubtitle} numberOfLines={1}>
+                    <Pressable style={[styles.modalContent, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation()}>
+                        <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Navigate to</Text>
+                        <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]} numberOfLines={1}>
                             {destinationName}
                         </Text>
 
@@ -154,22 +156,22 @@ export function NavigationButton({
                                 (Platform.OS !== 'android' || app.name !== 'Apple Maps') && (
                                     <TouchableOpacity
                                         key={app.name}
-                                        style={styles.appItem}
+                                        style={[styles.appItem, { backgroundColor: colors.background }]}
                                         onPress={() => openNavigation(app)}
                                         activeOpacity={0.7}
                                     >
-                                        <View style={styles.appIcon}>
+                                        <View style={[styles.appIcon, { backgroundColor: colors.border }]}>
                                             <Ionicons
                                                 name={app.icon}
                                                 size={24}
-                                                color={Colors.neonGreen}
+                                                color={colors.accent}
                                             />
                                         </View>
-                                        <Text style={styles.appName}>{app.name}</Text>
+                                        <Text style={[styles.appName, { color: colors.textPrimary }]}>{app.name}</Text>
                                         <Ionicons
                                             name="chevron-forward"
                                             size={20}
-                                            color={Colors.textSecondary}
+                                            color={colors.textSecondary}
                                         />
                                     </TouchableOpacity>
                                 )
@@ -180,7 +182,7 @@ export function NavigationButton({
                             style={styles.cancelButton}
                             onPress={() => setShowModal(false)}
                         >
-                            <Text style={styles.cancelText}>Cancel</Text>
+                            <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
                         </TouchableOpacity>
                     </Pressable>
                 </Pressable>
@@ -211,7 +213,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalContent: {
-        backgroundColor: Colors.darkGray,
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         padding: 24,
@@ -220,12 +221,10 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: Colors.textPrimary,
         textAlign: 'center',
     },
     modalSubtitle: {
         fontSize: 14,
-        color: Colors.textSecondary,
         textAlign: 'center',
         marginTop: 4,
         marginBottom: 24,
@@ -236,7 +235,6 @@ const styles = StyleSheet.create({
     appItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: Colors.mediumGray,
         borderRadius: 16,
         padding: 16,
     },
@@ -244,7 +242,6 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 12,
-        backgroundColor: Colors.darkGray,
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 14,
@@ -253,7 +250,6 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         fontWeight: '500',
-        color: Colors.textPrimary,
     },
     cancelButton: {
         marginTop: 16,
@@ -263,6 +259,5 @@ const styles = StyleSheet.create({
     cancelText: {
         fontSize: 16,
         fontWeight: '500',
-        color: Colors.textSecondary,
     },
 });
