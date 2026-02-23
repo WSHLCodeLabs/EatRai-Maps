@@ -22,6 +22,13 @@ function RootNavigator() {
           <Stack.Screen name="signup" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           <Stack.Screen name="restaurant-detail" options={{ headerShown: false }} />
+          <Stack.Screen name="saved-places" options={{ headerShown: false }} />
+          <Stack.Screen name="recent-searches" options={{ headerShown: false }} />
+          <Stack.Screen name="my-reviews" options={{ headerShown: false }} />
+          <Stack.Screen name="settings" options={{ headerShown: false }} />
+          <Stack.Screen name="notifications" options={{ headerShown: false }} />
+          <Stack.Screen name="help-support" options={{ headerShown: false }} />
+          <Stack.Screen name="about" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       </RestaurantProvider>

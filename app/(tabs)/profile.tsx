@@ -2,14 +2,10 @@ import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ProfileScreen() {
     const { isDarkMode, toggleTheme, colors } = useTheme();
-
-    const handleMenuPress = (label: string) => {
-        Alert.alert(label, `"${label}" feature coming soon!`);
-    };
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -45,14 +41,14 @@ export default function ProfileScreen() {
 
                 {/* Menu Items */}
                 <View style={[styles.menuSection, { backgroundColor: colors.card }]}>
-                    <MenuItem icon="heart-outline" label="Saved Places" colors={colors} onPress={() => handleMenuPress('Saved Places')} />
-                    <MenuItem icon="time-outline" label="Recent Searches" colors={colors} onPress={() => handleMenuPress('Recent Searches')} />
-                    <MenuItem icon="star-outline" label="My Reviews" colors={colors} onPress={() => handleMenuPress('My Reviews')} />
+                    <MenuItem icon="heart-outline" label="Saved Places" colors={colors} onPress={() => router.push('/saved-places' as any)} />
+                    <MenuItem icon="time-outline" label="Recent Searches" colors={colors} onPress={() => router.push('/recent-searches' as any)} />
+                    <MenuItem icon="star-outline" label="My Reviews" colors={colors} onPress={() => router.push('/my-reviews' as any)} />
                 </View>
 
                 <View style={[styles.menuSection, { backgroundColor: colors.card }]}>
-                    <MenuItem icon="settings-outline" label="Settings" colors={colors} onPress={() => handleMenuPress('Settings')} />
-                    <MenuItem icon="notifications-outline" label="Notifications" colors={colors} onPress={() => handleMenuPress('Notifications')} />
+                    <MenuItem icon="settings-outline" label="Settings" colors={colors} onPress={() => router.push('/settings' as any)} />
+                    <MenuItem icon="notifications-outline" label="Notifications" colors={colors} onPress={() => router.push('/notifications' as any)} />
                     {/* Dark Mode Toggle */}
                     <View style={[styles.menuItem, { borderBottomColor: colors.border }]}>
                         <Ionicons name="moon-outline" size={22} color={colors.textSecondary} />
@@ -67,8 +63,8 @@ export default function ProfileScreen() {
                 </View>
 
                 <View style={[styles.menuSection, { backgroundColor: colors.card }]}>
-                    <MenuItem icon="help-circle-outline" label="Help & Support" colors={colors} onPress={() => handleMenuPress('Help & Support')} />
-                    <MenuItem icon="information-circle-outline" label="About" colors={colors} onPress={() => handleMenuPress('About')} />
+                    <MenuItem icon="help-circle-outline" label="Help & Support" colors={colors} onPress={() => router.push('/help-support' as any)} />
+                    <MenuItem icon="information-circle-outline" label="About" colors={colors} onPress={() => router.push('/about' as any)} />
                 </View>
 
                 {/* App Version */}
